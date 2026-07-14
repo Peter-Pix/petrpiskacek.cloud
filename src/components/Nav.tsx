@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MenuIcon, CloseIcon, ExternalLinkIcon } from "./icons";
+import { MenuIcon, CloseIcon } from "./icons";
 import SiteSwitcher from "./SiteSwitcher";
 
 const links = [
@@ -25,17 +25,6 @@ export default function Nav() {
             </a>
           </li>
         ))}
-        <li>
-          <a
-            href="https://petrpiskacek.cz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-apple inline-flex items-center gap-1"
-          >
-            .cz
-            <ExternalLinkIcon size={12} />
-          </a>
-        </li>
       </ul>
 
       <div className="flex items-center gap-2 md:hidden">
@@ -72,30 +61,6 @@ export default function Nav() {
                 </a>
               </li>
             ))}
-            <li className="border-t pt-4" style={{ borderColor: "var(--border)" }}>
-              <a
-                href="https://petrpiskacek.cz"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-                className="block text-lg font-medium"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                petrpiskacek.cz ↗
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://petrpiskacek.online"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-                className="block text-lg font-medium"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                petrpiskacek.online ↗
-              </a>
-            </li>
           </ul>
         </div>
       )}
