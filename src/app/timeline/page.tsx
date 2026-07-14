@@ -1,15 +1,11 @@
 import Nav from "@/components/Nav";
-import Hero from "@/components/Hero";
-import LiveStatus from "@/components/LiveStatus";
 import Timeline from "@/components/Timeline";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export default function TimelinePage() {
   return (
     <main className="relative">
       <Nav />
-      <Hero />
-      <LiveStatus />
       <Timeline />
       <Footer />
     </main>
