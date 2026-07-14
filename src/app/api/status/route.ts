@@ -22,9 +22,9 @@ export async function GET() {
   return NextResponse.json({
     services: {
       llm: { status: llmStatus, latency: llmLatency },
-      image: { status: "online", latency: "1.2s avg" },
-      speech: { status: "online", latency: "300ms avg" },
-      ocr: { status: "online", latency: "800ms avg" },
+      image: { status: "online", latency: "1,2 s" },
+      speech: { status: "online", latency: "300 ms" },
+      ocr: { status: "online", latency: "800 ms" },
       workflow: { status: "online", latency: "—" },
     },
     uptime: "99.7%",

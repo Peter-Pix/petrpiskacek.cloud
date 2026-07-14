@@ -13,19 +13,19 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "petrpiskacek.cloud — AI Infrastructure & Experiments",
+  title: "petrpiskacek.cloud — AI infrastruktura a experimenty",
   description:
     "Live AI Lab. Běžící AI služby, architektury, experimenty a ukázky infrastruktury. Stavím AI systémy, které něco dělají.",
   keywords: [
     "Petr Piskáček",
-    "AI Infrastructure",
+    "AI infrastruktura",
     "AI Lab",
     "LLM API",
-    "AI Agents",
-    "Knowledge Graphs",
+    "AI agenti",
+    "Knowledge Graph",
     "MCP",
     "Docker",
-    "automation",
+    "automatizace",
   ],
   authors: [{ name: "Petr Piskáček" }],
   icons: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "petrpiskacek.cloud — AI Infrastructure & Experiments",
+    title: "petrpiskacek.cloud — AI infrastruktura a experimenty",
     description: "Live AI Lab. Běžící AI služby, architektury, experimenty.",
     type: "website",
     locale: "cs_CZ",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "petrpiskacek.cloud — AI Infrastructure & Experiments",
+    title: "petrpiskacek.cloud — AI infrastruktura a experimenty",
     description: "Live AI Lab. Běžící AI služby, architektury, experimenty.",
   },
 };

@@ -17,7 +17,7 @@ const projects: Project[] = [
   {
     year: 2026,
     name: "AI Portfolio",
-    description: "Osobní portfolio s AI chatbotem, silent memory a live AI labem",
+    description: "Osobní portfolio s AI chatbotem, pamětí a live AI labem",
     progress: 100,
     status: "done",
     tags: ["Next.js", "OpenRouter", "AI"],
@@ -38,44 +38,44 @@ const projects: Project[] = [
     description: "Entity-relation graf pro rap scénu s D3-force vizualizací",
     progress: 100,
     status: "done",
-    tags: ["D3.js", "Canvas", "Graph"],
+    tags: ["D3.js", "Canvas", "Graf"],
   },
   {
     year: 2026,
     name: "AI Agent",
-    description: "Sub-agentní architektura s MCP servery a memory systémy",
+    description: "Sub-agentní architektura s MCP servery a paměťovými systémy",
     progress: 80,
     status: "active",
-    tags: ["OpenClaw", "MCP", "Agents"],
+    tags: ["OpenClaw", "MCP", "Agenti"],
   },
   {
     year: 2026,
-    name: "SEO Automation",
-    description: "Automatizovaná SEO indexace, sitemap generování a Schema.org markup",
+    name: "SEO Automatizace",
+    description: "Automatizovaná SEO indexace, generování sitemap a Schema.org markup",
     progress: 90,
     status: "active",
-    tags: ["SEO", "JSON-LD", "Automation"],
+    tags: ["SEO", "JSON-LD", "Automatizace"],
   },
   {
     year: 2026,
-    name: "Voice Models",
-    description: "AI voice cloning a speech recognition pipeline",
+    name: "Voice Modely",
+    description: "AI voice cloning a pipeline pro rozpoznávání řeči",
     progress: 60,
     status: "active",
-    tags: ["TTS", "STT", "Voice"],
+    tags: ["TTS", "STT", "Hlas"],
   },
   {
     year: 2026,
     name: "4Rap Studio",
-    description: "Creative nástroje pro rap writing — 4Bars, 4Flow, LLM gateway",
+    description: "Kreativní nástroje pro rap writing — 4Bars, 4Flow, LLM gateway",
     progress: 70,
     status: "active",
-    tags: ["Next.js", "LLM", "Creative"],
+    tags: ["Next.js", "LLM", "Kreativa"],
   },
   {
     year: 2025,
     name: "VocalBrain",
-    description: "AI-powered voice analysis and transcription platform",
+    description: "AI platforma pro analýzu a přepis hlasu",
     progress: 100,
     status: "done",
     tags: ["Python", "AI", "Audio"],
@@ -95,12 +95,12 @@ export default function Timeline() {
   return (
     <section id="timeline" className="section-apple">
       <div className="container-apple">
-        <p className="eyebrow mb-3 text-center">Activity</p>
+        <p className="eyebrow mb-3 text-center">Aktivita</p>
         <h2 className="headline-lg mb-4 text-center">
-          Timeline
+          Časová osa
         </h2>
         <p className="subhead mx-auto mb-12 max-w-xl text-center">
-          Recruiter vidí aktivitu. Ne papír.
+          Náborář vidí aktivitu. Ne papír.
         </p>
 
         <div className="mx-auto max-w-3xl">
@@ -153,10 +153,10 @@ export default function Timeline() {
                               }}
                             >
                               {project.status === "done"
-                                ? "Done"
+                                ? "Hotovo"
                                 : project.status === "active"
-                                  ? "Active"
-                                  : "Paused"}
+                                  ? "Aktivní"
+                                  : "Pozastaveno"}
                             </span>
                           </div>
                           <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
@@ -206,7 +206,7 @@ export default function Timeline() {
 
         <div className="mt-12 text-center">
           <a href="/challenge" className="btn-apple btn-apple-primary">
-            Challenge Me <ArrowRightIcon size={16} />
+            Otestuj mě <ArrowRightIcon size={16} />
           </a>
         </div>
       </div>

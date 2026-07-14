@@ -6,12 +6,12 @@ const terminalLines = [
   { text: "$ whoami", delay: 300 },
   { text: "> Petr Piskáček", delay: 600 },
   { text: "> I build AI systems", delay: 400 },
-  { text: "> that automate real work.", delay: 500 },
+  { text: "> Stavím AI systémy, které něco dělají.", delay: 500 },
   { text: "", delay: 200 },
   { text: "$ ./status", delay: 400 },
-  { text: "> AI Lab · 5 services online", delay: 500 },
-  { text: "> Uptime: 99.7%", delay: 400 },
-  { text: "> Last deploy: today", delay: 400 },
+  { text: "> AI Lab · 5 služeb online", delay: 500 },
+  { text: "> Uptime: 99.7 %", delay: 400 },
+  { text: "> Poslední deploy: dnes", delay: 400 },
 ];
 
 export default function Hero() {
@@ -67,7 +67,7 @@ export default function Hero() {
 
       <div className="container-narrow relative z-10">
         <p className="eyebrow mb-4 animate-fade-in-up" style={{ color: "var(--gold)" }}>
-          AI Infrastructure &amp; Experiments
+          AI infrastruktura &amp; experimenty
         </p>
 
         {/* Terminal */}
@@ -129,14 +129,14 @@ export default function Hero() {
           className="subhead mx-auto mb-6 max-w-2xl animate-fade-in-up"
           style={{ animationDelay: "0.3s" }}
         >
-          Currently experimenting with:
+          Aktuálně experimentuju s:
         </p>
 
         <div
           className="mb-10 flex flex-wrap justify-center gap-2 animate-fade-in-up"
           style={{ animationDelay: "0.4s" }}
         >
-          {["AI Agents", "Knowledge Graphs", "MCP", "Docker", "LLMs", "SEO Automation"].map(
+          {["AI Agenti", "Knowledge Graphy", "MCP", "Docker", "LLM", "SEO Automatizace"].map(
             (tag) => (
               <span
                 key={tag}
@@ -158,10 +158,10 @@ export default function Hero() {
           style={{ animationDelay: "0.5s" }}
         >
           <a href="#live-status" className="btn-apple btn-apple-primary w-full sm:w-auto">
-            Live Status
+            Živý přehled
           </a>
           <a href="/challenge" className="btn-apple btn-apple-secondary w-full sm:w-auto">
-            Challenge Me
+            Otestuj mě
           </a>
         </div>
       </div>

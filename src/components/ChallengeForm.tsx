@@ -99,9 +99,9 @@ export default function ChallengeForm() {
   return (
     <section className="section-apple">
       <div className="container-narrow">
-        <p className="eyebrow mb-3 text-center">Challenge Me</p>
+        <p className="eyebrow mb-3 text-center">Otestuj mě</p>
         <h2 className="headline-lg mb-4 text-center">
-          Otestuj mě.
+          Zadej mi úkol.
         </h2>
         <p className="subhead mx-auto mb-10 max-w-xl text-center">
           Napiš problém. Do 30 sekund uvidíš architekturu, cenu, roadmapu a technologie.
@@ -115,7 +115,7 @@ export default function ChallengeForm() {
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Build me an AI solution for a logistics company..."
+            placeholder="Navrhni mi AI řešení pro logistickou firmu..."
             rows={4}
             className="w-full resize-none bg-transparent px-5 py-4 text-sm outline-none"
             style={{
@@ -133,7 +133,7 @@ export default function ChallengeForm() {
             style={{ borderColor: "var(--border)" }}
           >
             <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-              {prompt.length > 0 ? `${prompt.length} znaků` : "Napiš challenge..."}
+              {prompt.length > 0 ? `${prompt.length} znaků` : "Napiš zadání..."}
             </span>
             <div className="flex gap-2">
               {loading ? (
@@ -155,7 +155,7 @@ export default function ChallengeForm() {
                   className="btn-apple btn-apple-primary"
                 >
                   <SparklesIcon size={16} />
-                  Generate
+                  Generovat
                 </button>
               )}
             </div>
@@ -181,7 +181,7 @@ export default function ChallengeForm() {
           <div className="flex items-center justify-center gap-3 py-12">
             <CpuIcon size={24} className="animate-pulse-slow" />
             <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Generating solution...
+              Generuji řešení...
             </span>
           </div>
         )}
@@ -212,7 +212,7 @@ export default function ChallengeForm() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="h-2 w-2 rounded-full bg-gold animate-pulse-slow" />
                   <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
-                    Generating...
+                  Generuje se...
                   </span>
                 </div>
                 <div
@@ -230,7 +230,7 @@ export default function ChallengeForm() {
         {done && (
           <div className="mt-8 text-center">
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Generated live by Petr&apos;s AI stack.
+            Generováno živě pomocí Petr&apos;s AI stacku.
             </p>
           </div>
         )}

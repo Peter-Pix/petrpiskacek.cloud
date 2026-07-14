@@ -3,29 +3,29 @@ import { NextRequest, NextResponse } from "next/server";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "anthropic/claude-sonnet-5";
 
-const SYSTEM_PROMPT = `Jsi AI solution architect. Generuješ kompletní návrh AI řešení na základě user inputu.
+const SYSTEM_PROMPT = `Jsi AI solution architect. Generuješ kompletní návrh AI řešení na základě zadání uživatele.
 
-Output formát (použij ## pro sekce):
+Formát výstupu (použij ## pro sekce):
 
-## Architecture
+## Architektura
 Popiš architekturu řešení. Jaké komponenty, jak spolu komunikují, jaké technologie.
 
-## Cost Estimate
+## Odhad nákladů
 Odhad ceny. Rozděl na jednorázové náklady a měsíční provoz. Uveď v USD.
 
-## Roadmap
+## Harmonogram
 Časový plán implementace. Rozděl na fáze (týdny/měsíce).
 
-## Tech Stack
+## Technologie
 Seznam technologií. Každá na nový řádek s krátkým popisem.
 
-## Database Design
-Návrh databáze. Hlavní tabulky/entity a vztahy mezi nimi.
+## Návrh databáze
+Hlavní tabulky/entity a vztahy mezi nimi.
 
 ## Workflow
 Krok za krokem, jak řešení funguje od vstupu po výstup.
 
-Piš česky nebo anglicky podle user inputu. Buď konkrétní, ne obecný.`;
+Piš česky. Buď konkrétní, ne obecný.`;
 
 export async function POST(req: NextRequest) {
   try {

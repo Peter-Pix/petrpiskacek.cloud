@@ -25,32 +25,32 @@ const defaultServices: Service[] = [
     name: "LLM API",
     icon: <SparklesIcon size={18} />,
     status: "online",
-    latency: "200ms avg",
-    description: "OpenRouter-powered LLM inference",
+    latency: "200 ms",
+    description: "OpenRouter — LLM inference",
   },
   {
     id: "image",
-    name: "Image Generation",
+    name: "Generování obrázků",
     icon: <ImageIcon size={18} />,
     status: "online",
-    latency: "1.2s avg",
-    description: "AI image generation pipeline",
+    latency: "1,2 s",
+    description: "Pipeline pro generování AI obrázků",
   },
   {
     id: "speech",
-    name: "Speech Recognition",
+    name: "Rozpoznávání řeči",
     icon: <MicIcon size={18} />,
     status: "online",
-    latency: "300ms avg",
-    description: "Real-time speech-to-text",
+    latency: "300 ms",
+    description: "Přepis řeči na text v reálném čase",
   },
   {
     id: "ocr",
     name: "OCR",
     icon: <ScanIcon size={18} />,
     status: "online",
-    latency: "800ms avg",
-    description: "Document text extraction",
+    latency: "800 ms",
+    description: "Extrakce textu z dokumentů",
   },
   {
     id: "workflow",
@@ -58,7 +58,7 @@ const defaultServices: Service[] = [
     icon: <WorkflowIcon size={18} />,
     status: "online",
     latency: "—",
-    description: "Automated workflow orchestration",
+    description: "Automatizované orchestrace workflow",
   },
 ];
 
@@ -96,7 +96,7 @@ export default function LiveStatus() {
       <div className="container-apple">
         <p className="eyebrow mb-3 text-center">Live AI Lab</p>
         <h2 className="headline-lg mb-4 text-center">
-          Services
+          Služby
         </h2>
         <p className="subhead mx-auto mb-12 max-w-xl text-center">
           Reálně běžící AI služby. Některé na OpenRouter, některé na lokální infrastruktuře.
@@ -131,10 +131,10 @@ export default function LiveStatus() {
                         }}
                       >
                         {service.status === "online"
-                          ? "Running"
+                          ? "Běží"
                           : service.status === "degraded"
-                            ? "Degraded"
-                            : "Offline"}
+                            ? "Omezeně"
+                            : "Nedostupné"}
                       </span>
                     </span>
                   </div>
@@ -143,7 +143,7 @@ export default function LiveStatus() {
                   </p>
                   {service.latency && service.latency !== "—" && (
                     <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
-                      Latency: {service.latency}
+                      Odezva: {service.latency}
                     </p>
                   )}
                 </div>
@@ -154,7 +154,7 @@ export default function LiveStatus() {
 
         <div className="mt-12 text-center">
           <a href="/challenge" className="btn-apple btn-apple-primary">
-            Challenge Me
+            Otestuj mě
           </a>
         </div>
       </div>

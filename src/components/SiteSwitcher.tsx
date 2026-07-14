@@ -9,7 +9,7 @@ interface SiteSwitcherProps {
 
 const sites = {
   cz: { label: "petrpiskacek.cz", href: "https://petrpiskacek.cz", desc: "Profesionální prezentace" },
-  cloud: { label: "petrpiskacek.cloud", href: "https://petrpiskacek.cloud", desc: "AI Infrastructure & Experiments" },
+  cloud: { label: "petrpiskacek.cloud", href: "https://petrpiskacek.cloud", desc: "AI infrastruktura a experimenty" },
   online: { label: "petrpiskacek.online", href: "https://petrpiskacek.online", desc: "Příběh, vize, proč to dělám" },
 };
 

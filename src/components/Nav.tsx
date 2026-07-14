@@ -5,9 +5,9 @@ import { MenuIcon, CloseIcon } from "./icons";
 import SiteSwitcher from "./SiteSwitcher";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/timeline", label: "Timeline" },
-  { href: "/challenge", label: "Challenge" },
+  { href: "/", label: "Domů" },
+  { href: "/timeline", label: "Časová osa" },
+  { href: "/challenge", label: "Otestuj mě" },
 ];
 
 export default function Nav() {
