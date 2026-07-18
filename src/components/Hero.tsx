@@ -24,8 +24,8 @@ export default function Hero() {
 
   useEffect(() => {
     if (visibleLines >= terminalLines.length) {
-      setShowCursor(false);
-      return;
+      const t = setTimeout(() => setShowCursor(false), 0);
+      return () => clearTimeout(t);
     }
 
     const line = terminalLines[visibleLines];
