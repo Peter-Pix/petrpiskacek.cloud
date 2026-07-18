@@ -16,10 +16,10 @@ const BLOCK_LABELS: Record<BlockKind, string> = {
 };
 
 const SAMPLE_PROMPTS = [
-  "AI pro plánování závozů v logistické firmě",
-  "Chatbot pro e-shop s oblečením, 50 produktů denně",
-  "Interní nástroj pro shrnutí meetingů, 30 lidí v týmu",
-  "AI asistent pro právní firmu, analýza smluv",
+  "AI asistent pro malou logistickou firmu, 10 řidičů",
+  "Chatbot pro e-shop, co odpoví na dotazy o velikostech",
+  "Interní nástroj na shrnutí meetingů, tým 30 lidí",
+  "AI na analýzu smluv pro právní firmu",
 ];
 
 export default function SparringForm() {
