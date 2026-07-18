@@ -37,10 +37,12 @@ export default function Hero() {
       return () => clearTimeout(t);
     }
 
-    setTyping(true);
+    queueMicrotask(() => {
+      setTyping(true);
+      setTypedText("");
+    });
     const text = line.text;
     charIndexRef.current = 0;
-    setTypedText("");
 
     const typeChar = () => {
       if (charIndexRef.current < text.length) {
