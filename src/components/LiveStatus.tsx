@@ -152,10 +152,61 @@ export default function LiveStatus() {
           </div>
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 flex flex-col items-center gap-4 text-center">
           <a href="/challenge" className="btn-apple btn-apple-primary">
             Otestuj mě
           </a>
+        </div>
+
+        {/* CTA — propojení s online (příběh, proč to dělám) */}
+        <div className="mt-16 flex flex-col items-center gap-3 text-center">
+          <p
+            className="max-w-md text-sm"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Jo, a když tě zajímá spíš <em>proč</em> to celé dělám, co mě žene a kam jdu —
+          </p>
+          <a
+            href="https://petrpiskacek.online"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-all hover:scale-[1.02]"
+            style={{
+              borderColor: "var(--gold)",
+              color: "var(--gold)",
+              backgroundColor: "transparent",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--gold)";
+              e.currentTarget.style.color = "var(--text-inverse)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "var(--gold)";
+            }}
+          >
+            Přečti si příběh
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-transform group-hover:translate-x-0.5"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+          <p
+            className="text-xs"
+            style={{ color: "var(--text-muted)" }}
+          >
+            petrpiskacek.online — člověk za tím vším
+          </p>
         </div>
       </div>
     </section>
