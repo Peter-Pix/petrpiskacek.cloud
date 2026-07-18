@@ -3,15 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 
 const terminalLines = [
-  { text: "$ whoami", delay: 300 },
-  { text: "> Petr Piskáček", delay: 600 },
-  { text: "> I build AI systems", delay: 400 },
-  { text: "> Stavím AI systémy, které něco dělají.", delay: 500 },
-  { text: "", delay: 200 },
-  { text: "$ ./status", delay: 400 },
-  { text: "> AI Lab · 5 služeb online", delay: 500 },
-  { text: "> Uptime: 99.7 %", delay: 400 },
-  { text: "> Poslední deploy: dnes", delay: 400 },
+  { text: "$ Stavím AI, která něco dělá.", delay: 800 },
+  { text: "", delay: 400 },
+  { text: "> Ne chatboty. Ne dema.", delay: 600 },
+  { text: "> Systémy, co reálně pracujou.", delay: 600 },
+  { text: "", delay: 400 },
+  { text: "$ ./live", delay: 400 },
+  { text: "> 3 běžící aplikace", delay: 500 },
+  { text: "> 5 AI služeb online", delay: 400 },
 ];
 
 export default function Hero() {
@@ -69,7 +68,7 @@ export default function Hero() {
 
       <div className="container-narrow relative z-10">
         <p className="eyebrow mb-4 animate-fade-in-up" style={{ color: "var(--gold)" }}>
-          AI infrastruktura &amp; experimenty
+          AI, která pracuje
         </p>
 
         {/* Terminal */}
@@ -87,7 +86,7 @@ export default function Hero() {
             <span className="h-3 w-3 rounded-full bg-yellow-500/60" />
             <span className="h-3 w-3 rounded-full bg-green-500/60" />
             <span className="ml-2 text-xs" style={{ color: "var(--text-muted)" }}>
-              petrpiskacek.cloud — bash
+              petrpiskacek.cloud
             </span>
           </div>
 
@@ -131,29 +130,8 @@ export default function Hero() {
           className="subhead mx-auto mb-6 max-w-2xl animate-fade-in-up"
           style={{ animationDelay: "0.3s" }}
         >
-          Aktuálně experimentuju s:
+          Přepisuju hlas na text v reálném čase. Generuju obrázky z myšlenek. Plánuju trasy, který by tě samnýho nenapadly.
         </p>
-
-        <div
-          className="mb-10 flex flex-wrap justify-center gap-2 animate-fade-in-up"
-          style={{ animationDelay: "0.4s" }}
-        >
-          {["AI Agenti", "Knowledge Graphy", "MCP", "Docker", "LLM", "SEO Automatizace"].map(
-            (tag) => (
-              <span
-                key={tag}
-                className="rounded-full border px-3 py-1 text-xs font-medium"
-                style={{
-                  borderColor: "var(--tag-border)",
-                  backgroundColor: "var(--tag-bg)",
-                  color: "var(--tag-text)",
-                }}
-              >
-                {tag}
-              </span>
-            )
-          )}
-        </div>
 
         {/* Live projects grid */}
         <div
@@ -176,7 +154,7 @@ export default function Hero() {
               4rap.cz
             </div>
             <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-              Databáze českého rapu
+              Databáze českýho rapu
             </div>
             <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
               <span>1248 entit</span>
@@ -228,9 +206,9 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Metrics row */}
+        {/* Metrics row — zjednodušeno */}
         <div
-          className="mx-auto mb-10 grid max-w-2xl grid-cols-3 gap-3 animate-fade-in-up"
+          className="mx-auto mb-10 grid max-w-2xl grid-cols-2 gap-3 animate-fade-in-up"
           style={{ animationDelay: "0.5s" }}
         >
           <div
@@ -244,7 +222,7 @@ export default function Hero() {
               3
             </div>
             <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
-              Live appky
+              Běžící appky
             </div>
           </div>
           <div
@@ -261,20 +239,6 @@ export default function Hero() {
               AI služeb
             </div>
           </div>
-          <div
-            className="rounded-xl border p-3 text-center"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "rgba(0,0,0,0.2)",
-            }}
-          >
-            <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
-              99.7%
-            </div>
-            <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
-              Uptime
-            </div>
-          </div>
         </div>
 
         <div
@@ -282,7 +246,7 @@ export default function Hero() {
           style={{ animationDelay: "0.5s" }}
         >
           <a href="#live-status" className="btn-apple btn-apple-primary w-full sm:w-auto">
-            Živý přehled
+            Jak to běží
           </a>
           <a href="/challenge" className="btn-apple btn-apple-secondary w-full sm:w-auto">
             Otestuj mě
