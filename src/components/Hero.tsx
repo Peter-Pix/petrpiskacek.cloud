@@ -157,7 +157,7 @@ export default function Hero() {
 
         {/* Live projects grid */}
         <div
-          className="mx-auto mb-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 animate-fade-in-up"
+          className="mx-auto mb-6 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 animate-fade-in-up"
           style={{ animationDelay: "0.45s" }}
         >
           <a
@@ -226,6 +226,55 @@ export default function Hero() {
               <span>5 služeb online</span>
             </div>
           </a>
+        </div>
+
+        {/* Metrics row */}
+        <div
+          className="mx-auto mb-10 grid max-w-2xl grid-cols-3 gap-3 animate-fade-in-up"
+          style={{ animationDelay: "0.5s" }}
+        >
+          <div
+            className="rounded-xl border p-3 text-center"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "rgba(0,0,0,0.2)",
+            }}
+          >
+            <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
+              3
+            </div>
+            <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Live appky
+            </div>
+          </div>
+          <div
+            className="rounded-xl border p-3 text-center"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "rgba(0,0,0,0.2)",
+            }}
+          >
+            <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
+              5
+            </div>
+            <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
+              AI služeb
+            </div>
+          </div>
+          <div
+            className="rounded-xl border p-3 text-center"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "rgba(0,0,0,0.2)",
+            }}
+          >
+            <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
+              99.7%
+            </div>
+            <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Uptime
+            </div>
+          </div>
         </div>
 
         <div
