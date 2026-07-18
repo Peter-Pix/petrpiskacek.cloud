@@ -153,6 +153,79 @@ export default function Hero() {
           )}
         </div>
 
+        {/* Live projects grid */}
+        <div
+          className="mx-auto mb-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 animate-fade-in-up"
+          style={{ animationDelay: "0.45s" }}
+        >
+          <a
+            href="https://4rap.cz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "rgba(0,0,0,0.3)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <div className="mb-1 text-lg">🎵</div>
+            <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+              4rap.cz
+            </div>
+            <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
+              Databáze českého rapu
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
+              <span>1248 entit</span>
+              <span className="text-zinc-600">·</span>
+              <span>5896 vazeb</span>
+            </div>
+          </a>
+          <a
+            href="https://karel.petrpiskacek.cloud"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "rgba(0,0,0,0.3)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <div className="mb-1 text-lg">🤖</div>
+            <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+              Karel Robot
+            </div>
+            <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
+              AI e-mailový admin
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
+              <span>Vyzkoušet →</span>
+            </div>
+          </a>
+          <a
+            href="/timeline"
+            className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "rgba(0,0,0,0.3)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <div className="mb-1 text-lg">🧠</div>
+            <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+              AI Lab
+            </div>
+            <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
+              Běžící AI služby
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
+              <span>5 služeb online</span>
+            </div>
+          </a>
+        </div>
+
         <div
           className="flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up"
           style={{ animationDelay: "0.5s" }}

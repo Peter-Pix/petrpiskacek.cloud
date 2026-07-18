@@ -73,6 +73,15 @@ const projects: Project[] = [
     tags: ["Next.js", "LLM", "Kreativa"],
   },
   {
+    year: 2026,
+    name: "Karel Robot",
+    description: "AI e-mailový administrátor — analyzuje e-maily, rozhoduje o dalším kroku",
+    progress: 90,
+    status: "active",
+    tags: ["Vite", "React", "Ollama", "AI"],
+    link: "https://karel.petrpiskacek.cloud",
+  },
+  {
     year: 2025,
     name: "VocalBrain",
     description: "AI platforma pro analýzu a přepis hlasu",
