@@ -1,12 +1,12 @@
 import Nav from "@/components/Nav";
-import ChallengeForm from "@/components/ChallengeForm";
+import SparringForm from "@/components/SparringForm";
 import Footer from "@/components/Footer";
 
 export default function ChallengePage() {
   return (
     <main className="relative">
       <Nav />
-      <ChallengeForm />
+      <SparringForm />
       <Footer />
     </main>
   );
