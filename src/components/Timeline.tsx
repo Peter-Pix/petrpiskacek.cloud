@@ -1,216 +1,149 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowRightIcon, ExternalLinkIcon } from "./icons";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRightIcon } from "./icons";
 
-interface Project {
-  year: number;
-  name: string;
-  description: string;
-  progress: number;
-  status: "active" | "done" | "paused";
-  tags: string[];
-  link?: string;
+interface Phase {
+  period: string;
+  title: string;
+  body: string;
+  highlight?: string;
 }
 
-const projects: Project[] = [
+const phases: Phase[] = [
   {
-    year: 2026,
-    name: "AI Portfolio",
-    description: "Osobní portfolio s AI chatbotem, pamětí a live AI labem",
-    progress: 100,
-    status: "done",
-    tags: ["Next.js", "OpenRouter", "AI"],
-    link: "https://petrpiskacek.cz",
+    period: "2023",
+    title: "Objevování",
+    body: "Ten rok jsem zjistil, že už ty LLM jsou k něčemu. Textový modely, který šly poprvý použít jako někdo, s kým si můžeš psát. A hlavně — ještě na tom nebyly žádný filtry. Mohls tomu říct prakticky cokoliv.",
+    highlight: "Poprvý jsem si připadal, že mluvím s někym, kdo odpovídá.",
   },
   {
-    year: 2026,
-    name: "4rap.cz",
-    description: "Operační systém pro českou rapovou scénu — 1248 entit, 5896 vazeb",
-    progress: 100,
-    status: "active",
-    tags: ["Next.js", "MDX", "Knowledge Graph"],
-    link: "https://4rap.cz",
+    period: "2023 — 2024",
+    title: "Cenzura a limity",
+    body: "Pak přišly zpátky ty trapný filtry. Půl roku, rok na to. Modely začaly bejt strašně striktní. Nechtěly pomoct ani s normálníma věcma.",
+    highlight: "Když jsi to uměl dobře vypruntovat, nebo to používal na správný věci, dalo se to. Ale otravný období to bylo.",
   },
   {
-    year: 2026,
-    name: "Knowledge Graph",
-    description: "Entity-relation graf pro rap scénu s D3-force vizualizací",
-    progress: 100,
-    status: "done",
-    tags: ["D3.js", "Canvas", "Graf"],
+    period: "2024",
+    title: "Lokální modely",
+    body: "Začal jsem experimentovat s lokálníma modelama. Byly dost často hned necenzurovaný. S tebou se neprali ani o normální věci, jako ty komerční.",
+    highlight: "Svoboda > pohodlí.",
   },
   {
-    year: 2026,
-    name: "AI Agent",
-    description: "Sub-agentní architektura s MCP servery a paměťovými systémy",
-    progress: 80,
-    status: "active",
-    tags: ["OpenClaw", "MCP", "Agenti"],
+    period: "2024 — 2025",
+    title: "Zvuk a obrázky",
+    body: "Potom jsem začal experimentovat se zvukem. S klonováním hlasů, aby byly co nejvěrnější. Nějaká sedmá generace se prostě už vydarila tak, že sám jsem nepoznal, jestli jsem to já, nebo můj klon.\n\nA potom mě začaly bavit generátory — Stable Diffusion, Flux, difuzní metody. Experimentoval jsem na RTX 5090 lokálně i na cloudovejch kartách. Díky tomu jsem se naučil dělat jak s obrázkama, tak s videama. Jak ze zoomu dostat z 30sekundovej nebo dvouminutovej klip celou story. Jak udržet konzistenci charakteru, oblečení, scén.",
   },
   {
-    year: 2026,
-    name: "SEO Automatizace",
-    description: "Automatizovaná SEO indexace, generování sitemap a Schema.org markup",
-    progress: 90,
-    status: "active",
-    tags: ["SEO", "JSON-LD", "Automatizace"],
-  },
-  {
-    year: 2026,
-    name: "Voice Modely",
-    description: "AI voice cloning a pipeline pro rozpoznávání řeči",
-    progress: 60,
-    status: "active",
-    tags: ["TTS", "STT", "Hlas"],
-  },
-  {
-    year: 2026,
-    name: "4Rap Studio",
-    description: "Kreativní nástroje pro rap writing — 4Bars, 4Flow, LLM gateway",
-    progress: 70,
-    status: "active",
-    tags: ["Next.js", "LLM", "Kreativa"],
-  },
-  {
-    year: 2026,
-    name: "Karel Robot",
-    description: "AI e-mailový administrátor — analyzuje e-maily, rozhoduje o dalším kroku",
-    progress: 90,
-    status: "active",
-    tags: ["Vite", "React", "Ollama", "AI"],
-    link: "https://karel.petrpiskacek.cloud",
-  },
-  {
-    year: 2025,
-    name: "VocalBrain",
-    description: "AI platforma pro analýzu a přepis hlasu",
-    progress: 100,
-    status: "done",
-    tags: ["Python", "AI", "Audio"],
+    period: "2025 — 2026",
+    title: "Cloud a agenti",
+    body: "A potom jsem přesedlal na cloudový modely. Protože díky tomu můžu dělat orchestraci. Využívat všechny — jak ty nejlepší, tak ty slabší, levnější, rychlejší. A ta kombinace je neuvěřitelná.\n\nA teď ty agentní systémy. Když člověk jim správně řekne, co mají dělat, a rozdělí práci — může to makat jako dvacet lidí.",
+    highlight: "Tohle je teď.",
   },
 ];
 
 export default function Timeline() {
-  const [animated, setAnimated] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const phaseRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimated(true), 300);
-    return () => clearTimeout(timer);
-  }, []);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = phaseRefs.current.indexOf(entry.target as HTMLDivElement);
+            if (idx !== -1) setActiveIndex(idx);
+          }
+        });
+      },
+      { threshold: 0.5, rootMargin: "-20% 0px -20% 0px" }
+    );
 
-  const years = [...new Set(projects.map((p) => p.year))].sort((a, b) => b - a);
+    phaseRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section id="timeline" className="section-apple">
       <div className="container-apple">
-        <p className="eyebrow mb-3 text-center">Aktivita</p>
+        <p className="eyebrow mb-3 text-center">Příběh</p>
         <h2 className="headline-lg mb-4 text-center">
-          Časová osa
+          Jak jsem se dostal k AI
         </h2>
-        <p className="subhead mx-auto mb-12 max-w-xl text-center">
-          Náborář vidí aktivitu. Ne papír.
+        <p className="subhead mx-auto mb-16 max-w-xl text-center">
+          Časová osa není inventář. Je to cesta.
         </p>
 
-        <div className="mx-auto max-w-3xl">
-          {years.map((year) => (
-            <div key={year} className="mb-10">
-              <h3 className="headline-md mb-6" style={{ color: "var(--gold)" }}>
-                {year}
-              </h3>
-              <div className="space-y-4">
-                {projects
-                  .filter((p) => p.year === year)
-                  .map((project) => (
-                    <div
-                      key={project.name}
-                      className="glass-card p-5 md:p-6"
+        <div className="relative mx-auto max-w-3xl">
+          {/* Vertikální čára */}
+          <div
+            className="absolute left-3 top-2 bottom-2 w-px md:left-1/2 md:-translate-x-1/2"
+            style={{ backgroundColor: "var(--border)" }}
+            aria-hidden="true"
+          />
+
+          {phases.map((phase, idx) => {
+            const isActive = idx === activeIndex;
+            return (
+              <div
+                key={phase.period}
+                ref={(el) => {
+                  phaseRefs.current[idx] = el;
+                }}
+                className="relative mb-16 pl-12 md:pl-0"
+              >
+                {/* Tečka na ose */}
+                <div
+                  className="absolute left-3 top-2 -translate-x-1/2 md:left-1/2"
+                  aria-hidden="true"
+                >
+                  <div
+                    className={`h-3 w-3 rounded-full transition-all duration-500 ${
+                      isActive ? "scale-150" : "scale-100"
+                    }`}
+                    style={{
+                      backgroundColor: isActive ? "var(--gold)" : "var(--text-muted)",
+                      boxShadow: isActive ? "0 0 0 6px rgba(200, 150, 46, 0.15)" : "none",
+                    }}
+                  />
+                </div>
+
+                <div
+                  className={`md:w-[calc(50%-2rem)] transition-opacity duration-500 ${
+                    isActive ? "opacity-100" : "opacity-60"
+                  } ${idx % 2 === 0 ? "md:ml-0 md:mr-auto" : "md:ml-auto md:mr-0"}`}
+                >
+                  <p
+                    className="mb-2 font-mono text-xs uppercase tracking-widest"
+                    style={{ color: isActive ? "var(--gold)" : "var(--text-muted)" }}
+                  >
+                    {phase.period}
+                  </p>
+                  <h3 className="headline-md mb-3">{phase.title}</h3>
+                  <p
+                    className="text-base leading-relaxed whitespace-pre-line"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {phase.body}
+                  </p>
+                  {phase.highlight && (
+                    <p
+                      className="mt-4 border-l-2 pl-4 text-base italic"
+                      style={{
+                        borderColor: "var(--gold)",
+                        color: "var(--text)",
+                      }}
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-base font-semibold">
-                              {project.link ? (
-                                <a
-                                  href={project.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 hover:text-gold transition-colors"
-                                >
-                                  {project.name}
-                                  <ExternalLinkIcon size={12} />
-                                </a>
-                              ) : (
-                                project.name
-                              )}
-                            </h4>
-                            <span
-                              className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
-                              style={{
-                                backgroundColor:
-                                  project.status === "done"
-                                    ? "rgba(34, 197, 94, 0.1)"
-                                    : project.status === "active"
-                                      ? "rgba(200, 150, 46, 0.1)"
-                                      : "rgba(113, 113, 122, 0.1)",
-                                color:
-                                  project.status === "done"
-                                    ? "#22c55e"
-                                    : project.status === "active"
-                                      ? "var(--gold)"
-                                      : "var(--text-muted)",
-                              }}
-                            >
-                              {project.status === "done"
-                                ? "Hotovo"
-                                : project.status === "active"
-                                  ? "Aktivní"
-                                  : "Pozastaveno"}
-                            </span>
-                          </div>
-                          <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
-                            {project.description}
-                          </p>
-                          <div className="mt-3 flex items-center gap-4">
-                            <div className="flex-1">
-                              <div className="progress-bar">
-                                <div
-                                  className="progress-bar-fill"
-                                  style={{
-                                    width: animated ? `${project.progress}%` : "0%",
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <span
-                              className="text-xs font-mono tabular-nums"
-                              style={{ color: "var(--text-muted)" }}
-                            >
-                              {project.progress}%
-                            </span>
-                          </div>
-                          <div className="mt-3 flex flex-wrap gap-1.5">
-                            {project.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full border px-2 py-0.5 text-[10px] font-medium"
-                                style={{
-                                  borderColor: "var(--tag-border)",
-                                  backgroundColor: "var(--tag-bg)",
-                                  color: "var(--tag-text)",
-                                }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      {phase.highlight}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-12 text-center">
