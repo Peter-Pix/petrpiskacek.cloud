@@ -37,7 +37,7 @@ const phases: Phase[] = [
   {
     period: "2025 — 2026",
     title: "Cloud a agenti",
-    body: "A potom jsem přesedlal na cloudový modely. Protože díky tomu můžu dělat orchestraci. Využívat všechny — jak ty nejlepší, tak ty slabší, levnější, rychlejší. A ta kombinace je neuvěřitelná.\n\nA teď ty agentní systémy. Když člověk jim správně řekne, co mají dělat, a rozdělí práci — víš dělá víc, než lidi myslí.",
+    body: "Cloudový modely. Orchestrace — nejlepší, levnější, rychlejší. Kombinace, která nemá chybu. A agenti. Správně rozdělená práce. Dělaj víc, než si lidi myslí.",
     highlight: "Čas od času víc šetřit čas.",
   },
 ];
