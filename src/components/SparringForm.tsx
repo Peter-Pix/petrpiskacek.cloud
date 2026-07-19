@@ -164,10 +164,10 @@ export default function SparringForm() {
       <div className="container-narrow">
         <p className="eyebrow mb-3 text-center">Sparring</p>
         <h2 className="headline-lg mb-4 text-center">
-          AI architekt pro tvoje nápady.
+          Promysli to, spartákem.
         </h2>
         <p className="subhead mx-auto mb-10 max-w-xl text-center">
-          Napiš zadání. Já se zeptám na 1-2 věci. Pak ti dám plán po blocích.
+          Vyber téma. Douptám se. Uvidíš sám.
         </p>
 
         {/* Fáze 0: Input */}
