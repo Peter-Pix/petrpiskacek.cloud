@@ -32,7 +32,7 @@ const phases: Phase[] = [
   {
     period: "2024 — 2025",
     title: "Zvuk a obrázky",
-    body: "Potom jsem začal experimentovat se zvukem. S klonováním hlasů, aby byly co nejvěrnější. Nějaká sedmá generace se prostě už vydarila tak, že sám jsem nepoznal, jestli jsem to já, nebo můj klon.\n\nA potom mě začaly bavit generátory — Stable Diffusion, Flux, difuzní metody. Moc malý hřiště. Odlet na cloud. Díky tomu jsem se naučil dělat jak s obrázkama, tak s videama. Jak ze zoomu dostat z 30sekundovej nebo dvouminutovej klip celou story. Jak udržet konzistenci charakteru, oblečení, scén.",
+    body: "Sedmá generace klonu. Sám jsem nepoznal, jestli jsem to já. Pak obrázky, videa. Z 30 vteřin klipu celej příběh. Konzistence charakteru, oblečení, scén. Moc malý hřiště — odlet na cloud.",
   },
   {
     period: "2025 — 2026",
