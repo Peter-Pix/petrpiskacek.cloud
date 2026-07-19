@@ -14,31 +14,31 @@ const phases: Phase[] = [
   {
     period: "2023",
     title: "Objevování",
-    body: "Ten rok jsem zjistil, že už ty LLM jsou k něčemu. Textový modely, který šly poprvý použít jako někdo, s kým si můžeš psát. A hlavně — ještě na tom nebyly žádný filtry. Mohls tomu říct prakticky cokoliv.",
+    body: "Člověk cítil změnu. Nemusel jsem programovat, stačilo mluvit. A ještě to nemělo zábrany — pro obě strany to byl úplně novej svět. Krok do neznáma.",
     highlight: "Poprvý jsem si připadal, že mluvím s někym, kdo odpovídá.",
   },
   {
     period: "2023 — 2024",
     title: "Cenzura a limity",
     body: "Pak přišly zpátky ty trapný filtry. Půl roku, rok na to. Modely začaly bejt strašně striktní. Nechtěly pomoct ani s normálníma věcma.",
-    highlight: "Když jsi to uměl dobře vypruntovat, nebo to používal na správný věci, dalo se to. Ale otravný období to bylo.",
+    highlight: "Chuť, učit se a touha vidět dál. Vypromtovat správně.",
   },
   {
     period: "2024",
     title: "Lokální modely",
     body: "Začal jsem experimentovat s lokálníma modelama. Byly dost často hned necenzurovaný. S tebou se neprali ani o normální věci, jako ty komerční.",
-    highlight: "Svoboda > pohodlí.",
+    highlight: "Jeden je fajn. Tým spoluhráčů vyhrává.",
   },
   {
     period: "2024 — 2025",
     title: "Zvuk a obrázky",
-    body: "Potom jsem začal experimentovat se zvukem. S klonováním hlasů, aby byly co nejvěrnější. Nějaká sedmá generace se prostě už vydarila tak, že sám jsem nepoznal, jestli jsem to já, nebo můj klon.\n\nA potom mě začaly bavit generátory — Stable Diffusion, Flux, difuzní metody. Experimentoval jsem na RTX 5090 lokálně i na cloudovejch kartách. Díky tomu jsem se naučil dělat jak s obrázkama, tak s videama. Jak ze zoomu dostat z 30sekundovej nebo dvouminutovej klip celou story. Jak udržet konzistenci charakteru, oblečení, scén.",
+    body: "Potom jsem začal experimentovat se zvukem. S klonováním hlasů, aby byly co nejvěrnější. Nějaká sedmá generace se prostě už vydarila tak, že sám jsem nepoznal, jestli jsem to já, nebo můj klon.\n\nA potom mě začaly bavit generátory — Stable Diffusion, Flux, difuzní metody. Moc malý hřiště. Odlet na cloud. Díky tomu jsem se naučil dělat jak s obrázkama, tak s videama. Jak ze zoomu dostat z 30sekundovej nebo dvouminutovej klip celou story. Jak udržet konzistenci charakteru, oblečení, scén.",
   },
   {
     period: "2025 — 2026",
     title: "Cloud a agenti",
-    body: "A potom jsem přesedlal na cloudový modely. Protože díky tomu můžu dělat orchestraci. Využívat všechny — jak ty nejlepší, tak ty slabší, levnější, rychlejší. A ta kombinace je neuvěřitelná.\n\nA teď ty agentní systémy. Když člověk jim správně řekne, co mají dělat, a rozdělí práci — může to makat jako dvacet lidí.",
-    highlight: "Tohle je teď.",
+    body: "A potom jsem přesedlal na cloudový modely. Protože díky tomu můžu dělat orchestraci. Využívat všechny — jak ty nejlepší, tak ty slabší, levnější, rychlejší. A ta kombinace je neuvěřitelná.\n\nA teď ty agentní systémy. Když člověk jim správně řekne, co mají dělat, a rozdělí práci — víš dělá víc, než lidi myslí.",
+    highlight: "Čas od času víc šetřit čas.",
   },
 ];
 
@@ -74,7 +74,7 @@ export default function Timeline() {
           Jak jsem se dostal k AI
         </h2>
         <p className="subhead mx-auto mb-16 max-w-xl text-center">
-          Časová osa není inventář. Je to cesta.
+          Čas od času víc šetřit čas.
         </p>
 
         <div className="relative mx-auto max-w-3xl">
