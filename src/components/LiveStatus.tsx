@@ -164,7 +164,7 @@ export default function LiveStatus() {
             className="max-w-md text-sm"
             style={{ color: "var(--text-secondary)" }}
           >
-            Jo, a když tě zajímá spíš <em>proč</em> to celé dělám, co mě žene a kam jdu —
+            Lidi se ptají proč to dělám.
           </p>
           <a
             href="https://petrpiskacek.online"
