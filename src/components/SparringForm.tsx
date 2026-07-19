@@ -164,7 +164,7 @@ export default function SparringForm() {
       <div className="container-narrow">
         <p className="eyebrow mb-3 text-center">Sparring</p>
         <h2 className="headline-lg mb-4 text-center">
-          Promysli to, spartákem.
+          Promysli to lépe
         </h2>
         <p className="subhead mx-auto mb-10 max-w-xl text-center">
           Vyber téma. Douptám se. Uvidíš sám.
