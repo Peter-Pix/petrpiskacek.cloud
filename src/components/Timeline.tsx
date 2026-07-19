@@ -26,7 +26,7 @@ const phases: Phase[] = [
   {
     period: "2024",
     title: "Lokální modely",
-    body: "Začal jsem experimentovat s lokálníma modelama. Byly dost často hned necenzurovaný. Na rozdíl od komerčních se mnou nehádali o běžné věci.",
+    body: "Začal jsem experimentovat s lokálníma modelama. Byly dost často hned necenzurovaný. Neprali se o normální věci. Žádný výmluvy.",
     highlight: "Jeden je fajn. Tým spoluhráčů vyhrává.",
   },
   {
