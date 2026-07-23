@@ -6,8 +6,8 @@ import SiteSwitcher from "./SiteSwitcher";
 
 const links = [
   { href: "/", label: "Domů" },
-  { href: "/timeline", label: "Časová osa" },
   { href: "/challenge", label: "Otestuj mě" },
+  { href: "/flash-ui", label: "Flash UI" },
 ];
 
 export default function Nav() {

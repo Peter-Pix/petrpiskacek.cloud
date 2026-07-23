@@ -185,7 +185,9 @@ export default function Hero() {
             </div>
           </a>
           <a
-            href="/timeline"
+            href="https://petrpiskacek.online#cesta"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
             style={{
               borderColor: "var(--border)",
@@ -195,13 +197,13 @@ export default function Hero() {
           >
             <div className="mb-1 text-lg">🧠</div>
             <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              AI Lab
+              Příběh
             </div>
             <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-              Běžící AI služby
+              Jak jsem se k tomu dostal
             </div>
             <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
-              <span>5 služeb online</span>
+              <span>Přečíst →</span>
             </div>
           </a>
         </div>
