@@ -16,50 +16,14 @@ interface Service {
   icon: React.ReactNode;
   status: "online" | "offline" | "degraded";
   latency?: string;
-  description: string;
 }
 
 const defaultServices: Service[] = [
-  {
-    id: "llm",
-    name: "AI asistent",
-    icon: <SparklesIcon size={18} />,
-    status: "online",
-    latency: "200 ms",
-    description: "Přemýšlí s tebou, ne jen odpovídá.",
-  },
-  {
-    id: "image",
-    name: "Obrázky z myšlenek",
-    icon: <ImageIcon size={18} />,
-    status: "online",
-    latency: "1,2 s",
-    description: "Řekneš co chceš vidět, ono to nakreslí.",
-  },
-  {
-    id: "speech",
-    name: "Hlas na text",
-    icon: <MicIcon size={18} />,
-    status: "online",
-    latency: "300 ms",
-    description: "Mluvíš, ono to píše. Jako když ti někdo dělá poznámky.",
-  },
-  {
-    id: "ocr",
-    name: "Čtení z fotek",
-    icon: <ScanIcon size={18} />,
-    status: "online",
-    latency: "800 ms",
-    description: "Vyfotíš dokument, ono to přečte.",
-  },
-  {
-    id: "workflow",
-    name: "Automaty",
-    icon: <WorkflowIcon size={18} />,
-    status: "online",
-    latency: "—",
-    description: "Dělaj nudnou práci za tebe. Pořád.",
-  },
+  { id: "llm", name: "AI asistent", icon: <SparklesIcon size={16} />, status: "online", latency: "200 ms" },
+  { id: "image", name: "Generování obrázků", icon: <ImageIcon size={16} />, status: "online", latency: "1,2 s" },
+  { id: "speech", name: "Hlas na text", icon: <MicIcon size={16} />, status: "online", latency: "300 ms" },
+  { id: "ocr", name: "Čtení z fotek", icon: <ScanIcon size={16} />, status: "online", latency: "800 ms" },
+  { id: "workflow", name: "Automaty", icon: <WorkflowIcon size={16} />, status: "online", latency: "—" },
 ];
 
 export default function LiveStatus() {
@@ -81,9 +45,7 @@ export default function LiveStatus() {
             );
           }
         }
-      } catch {
-        // Keep defaults
-      }
+      } catch { /* keep defaults */ }
     }
 
     fetchStatus();
@@ -91,35 +53,59 @@ export default function LiveStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <section id="live-status" className="section-apple">
-      <div className="container-apple">
-        <p className="eyebrow mb-3 text-center">Live AI Lab</p>
-        <h2 className="headline-lg mb-4 text-center">
-          Služby
-        </h2>
-        <p className="subhead mx-auto mb-12 max-w-xl text-center">
-          Reálně běžící AI služby. Některé na OpenRouter, některé na lokální infrastruktuře.
-        </p>
+  const online = services.filter((s) => s.status === "online").length;
 
+  return (
+    <section id="system-status" className="section-apple">
+      <div className="container-apple">
         <div className="mx-auto max-w-3xl">
-          <div className="bento-grid">
-            {services.map((service) => (
-              <div
-                key={service.id}
-                className="glass-card flex items-start gap-4 p-5 md:p-6"
-              >
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: "var(--tag-bg)", color: "var(--gold)" }}
-                >
-                  {service.icon}
+          <div className="glass-card p-6 md:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="eyebrow mb-1">System Status</p>
+                <h2 className="headline-md">Infrastruktura</h2>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
+                  {online}/{services.length}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-semibold">{service.name}</h3>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium">
-                      <span className={`status-dot ${service.status}`} />
+                <div className="text-[10px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                  Služeb online
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="flex items-center justify-between gap-3 rounded-xl p-3"
+                  style={{ backgroundColor: "var(--bg-primary)" }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div style={{ color: "var(--gold)" }}>
+                      {service.icon}
+                    </div>
+                    <span className="text-sm font-medium">{service.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {service.latency && service.latency !== "—" && (
+                      <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                        {service.latency}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          backgroundColor:
+                            service.status === "online"
+                              ? "var(--status-online)"
+                              : service.status === "degraded"
+                                ? "var(--status-degraded)"
+                                : "var(--status-offline)",
+                        }}
+                      />
                       <span
                         style={{
                           color:
@@ -130,83 +116,14 @@ export default function LiveStatus() {
                                 : "var(--status-offline)",
                         }}
                       >
-                        {service.status === "online"
-                          ? "Běží"
-                          : service.status === "degraded"
-                            ? "Omezeně"
-                            : "Nedostupné"}
+                        {service.status === "online" ? "Běží" : service.status === "degraded" ? "Omezeně" : "Nedostupné"}
                       </span>
                     </span>
                   </div>
-                  <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
-                    {service.description}
-                  </p>
-                  {service.latency && service.latency !== "—" && (
-                    <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
-                      Odezva: {service.latency}
-                    </p>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-
-        <div className="mt-12 flex flex-col items-center gap-4 text-center">
-          <a href="/challenge" className="btn-apple btn-apple-primary">
-            Otestuj mě
-          </a>
-        </div>
-
-        {/* CTA — propojení s online (příběh, proč to dělám) */}
-        <div className="mt-16 flex flex-col items-center gap-3 text-center">
-          <p
-            className="max-w-md text-sm"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            Lidi se ptají proč to dělám.
-          </p>
-          <a
-            href="https://petrpiskacek.online"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-all hover:scale-[1.02]"
-            style={{
-              borderColor: "var(--gold)",
-              color: "var(--gold)",
-              backgroundColor: "transparent",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--gold)";
-              e.currentTarget.style.color = "var(--text-inverse)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = "var(--gold)";
-            }}
-          >
-            Přečti si příběh
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="transition-transform group-hover:translate-x-0.5"
-            >
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </a>
-          <p
-            className="text-xs"
-            style={{ color: "var(--text-muted)" }}
-          >
-            petrpiskacek.online — člověk za tím vším
-          </p>
         </div>
       </div>
     </section>

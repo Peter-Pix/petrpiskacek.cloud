@@ -3,14 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 
 const terminalLines = [
-  { text: "$ Stavím AI, která něco dělá.", delay: 800 },
-  { text: "", delay: 400 },
-  { text: "> Ne chatboty. Ne dema.", delay: 600 },
-  { text: "> Systémy, co reálně pracujou.", delay: 600 },
-  { text: "", delay: 400 },
-  { text: "$ ./live", delay: 400 },
-  { text: "> 3 běžící aplikace", delay: 500 },
-  { text: "> 5 AI služeb online", delay: 400 },
+  { text: "$ ./apps", delay: 600 },
+  { text: "> 4 online · 1 beta · 1 brzy", delay: 500 },
+  { text: "", delay: 300 },
+  { text: "$ ./status", delay: 400 },
+  { text: "> Všechno běží.", delay: 500 },
 ];
 
 export default function Hero() {
@@ -18,7 +15,6 @@ export default function Hero() {
   const [showCursor, setShowCursor] = useState(true);
   const [typing, setTyping] = useState(false);
   const [typedText, setTypedText] = useState("");
-  const currentLineRef = useRef(0);
   const charIndexRef = useRef(0);
 
   useEffect(() => {
@@ -29,7 +25,6 @@ export default function Hero() {
 
     const line = terminalLines[visibleLines];
     if (!line.text) {
-      // Empty line — just advance
       const t = setTimeout(() => {
         setVisibleLines((v) => v + 1);
       }, line.delay);
@@ -68,19 +63,18 @@ export default function Hero() {
 
       <div className="container-narrow relative z-10">
         <p className="eyebrow mb-4 animate-fade-in-up" style={{ color: "var(--gold)" }}>
-          AI, která pracuje
+          AI Playground
         </p>
 
         {/* Terminal */}
         <div
-          className="mx-auto mb-10 max-w-xl rounded-2xl border p-5 text-left font-mono text-sm md:p-6"
+          className="mx-auto mb-8 max-w-lg rounded-2xl border p-5 text-left font-mono text-sm md:p-6"
           style={{
             borderColor: "var(--border)",
             backgroundColor: "rgba(0,0,0,0.4)",
             backdropFilter: "blur(12px)",
           }}
         >
-          {/* Terminal header */}
           <div className="mb-4 flex items-center gap-2">
             <span className="h-3 w-3 rounded-full bg-red-500/60" />
             <span className="h-3 w-3 rounded-full bg-yellow-500/60" />
@@ -90,7 +84,6 @@ export default function Hero() {
             </span>
           </div>
 
-          {/* Terminal lines */}
           <div className="space-y-1 text-left">
             {Array.from({ length: visibleLines }).map((_, i) => {
               const line = terminalLines[i];
@@ -114,7 +107,6 @@ export default function Hero() {
               );
             })}
 
-            {/* Currently typing line */}
             {visibleLines < terminalLines.length && (
               <div>
                 <span style={{ color: "var(--gold)" }}>$</span>{" "}
@@ -125,133 +117,29 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Tagline */}
+        <h1
+          className="headline-xl mb-4 animate-fade-in-up"
+          style={{ animationDelay: "0.2s" }}
+        >
+          AI, která pracuje.
+        </h1>
+
         <p
-          className="subhead mx-auto mb-6 max-w-2xl animate-fade-in-up"
+          className="subhead mx-auto mb-8 max-w-xl animate-fade-in-up"
           style={{ animationDelay: "0.3s" }}
         >
-          Přepisuju hlas na text v reálném čase. Generuju obrázky z myšlenek. Plánuju trasy, který by tě samnýho nenapadly.
+          Každá appka dole běží naostro. Klikni a vyzkoušej.
         </p>
-
-        {/* Live projects grid */}
-        <div
-          className="mx-auto mb-6 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 animate-fade-in-up"
-          style={{ animationDelay: "0.45s" }}
-        >
-          <a
-            href="https://4rap.cz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "rgba(0,0,0,0.3)",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <div className="mb-1 text-lg">🎵</div>
-            <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              4rap.cz
-            </div>
-            <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-              Databáze českýho rapu
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
-              <span>1248 entit</span>
-              <span className="text-zinc-600">·</span>
-              <span>5896 vazeb</span>
-            </div>
-          </a>
-          <a
-            href="https://karel.petrpiskacek.cloud"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "rgba(0,0,0,0.3)",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <div className="mb-1 text-lg">🤖</div>
-            <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              Karel Robot
-            </div>
-            <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-              AI e-mailový admin
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
-              <span>Vyzkoušet →</span>
-            </div>
-          </a>
-          <a
-            href="https://petrpiskacek.online#cesta"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group rounded-xl border p-4 text-left transition-all duration-200 hover:scale-[1.02]"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "rgba(0,0,0,0.3)",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <div className="mb-1 text-lg">🧠</div>
-            <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              Příběh
-            </div>
-            <div className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-              Jak jsem se k tomu dostal
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
-              <span>Přečíst →</span>
-            </div>
-          </a>
-        </div>
-
-        {/* Metrics row — zjednodušeno */}
-        <div
-          className="mx-auto mb-10 grid max-w-2xl grid-cols-2 gap-3 animate-fade-in-up"
-          style={{ animationDelay: "0.5s" }}
-        >
-          <div
-            className="rounded-xl border p-3 text-center"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "rgba(0,0,0,0.2)",
-            }}
-          >
-            <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
-              3
-            </div>
-            <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
-              Běžící appky
-            </div>
-          </div>
-          <div
-            className="rounded-xl border p-3 text-center"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "rgba(0,0,0,0.2)",
-            }}
-          >
-            <div className="text-lg font-bold font-mono tabular-nums" style={{ color: "var(--gold)" }}>
-              5
-            </div>
-            <div className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
-              AI služeb
-            </div>
-          </div>
-        </div>
 
         <div
           className="flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up"
-          style={{ animationDelay: "0.5s" }}
+          style={{ animationDelay: "0.4s" }}
         >
-          <a href="#live-status" className="btn-apple btn-apple-primary w-full sm:w-auto">
-            Jak to běží
+          <a href="#apps" className="btn-apple btn-apple-primary w-full sm:w-auto">
+            Prohlédnout appky
           </a>
           <a href="/challenge" className="btn-apple btn-apple-secondary w-full sm:w-auto">
-            Otestuj mě
+            Otestuj AI konzultanta
           </a>
         </div>
       </div>
