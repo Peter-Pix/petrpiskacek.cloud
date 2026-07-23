@@ -97,4 +97,16 @@ export const apps: App[] = [
     external: false,
     category: "demo",
   },
+  {
+    id: "docbot",
+    name: "DocBot",
+    emoji: "📝",
+    tagline: "AI právník na český smlouvy",
+    description:
+      "Postaví ti NDA, nájemní nebo pracovní smlouvu podle českého práva. Chatem tě provede krok za krokem, pak smlouvu zkontroluje na právní rizika. DeepSeek V4 Flash backend, Vite + React frontend.",
+    status: "beta",
+    href: "https://karel-docbot.vercel.app",
+    external: true,
+    category: "ai",
+  },
 ];

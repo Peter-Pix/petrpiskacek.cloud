@@ -2,6 +2,39 @@ import { NextRequest, NextResponse } from "next/server";
 
 const OLLAMA_URL = "https://ollama.com/api/chat";
 const MODEL = "deepseek-v4-flash";
+const DAILY_LIMIT = 5;
+
+// Simple in-memory rate limiter per IP
+// For production, use Redis or persistent store
+const ipUsage = new Map<string, { count: number; date: string }>();
+
+function getClientIP(req: NextRequest): string {
+  // Try forwarded headers first (Vercel, Cloudflare, etc.)
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  // Fallback to direct connection IP
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetDate: string } {
+  const today = new Date().toISOString().split("T")[0];
+  const record = ipUsage.get(ip);
+
+  if (!record || record.date !== today) {
+    // New day or first visit — reset
+    ipUsage.set(ip, { count: 1, date: today });
+    return { allowed: true, remaining: DAILY_LIMIT - 1, resetDate: today };
+  }
+
+  if (record.count >= DAILY_LIMIT) {
+    return { allowed: false, remaining: 0, resetDate: today };
+  }
+
+  record.count++;
+  return { allowed: true, remaining: DAILY_LIMIT - record.count, resetDate: today };
+}
 
 const SYSTEM_PROMPT = `Jsi expert na HTML/CSS/JS. Generuješ čistý, funkční HTML kód na základě zadání uživatele.
 
@@ -35,6 +68,29 @@ Příklad výstupu:
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting check
+    const ip = getClientIP(req);
+    const limit = checkRateLimit(ip);
+
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          error: "Denní limit vyčerpán.",
+          message: `Můžeš generovat max ${DAILY_LIMIT}x denně. Zkus to zítra.`,
+          limit: DAILY_LIMIT,
+          remaining: 0,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(DAILY_LIMIT),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": limit.resetDate,
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const { prompt } = body;
 
@@ -137,6 +193,8 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-cache",
+        "X-RateLimit-Limit": String(DAILY_LIMIT),
+        "X-RateLimit-Remaining": String(limit.remaining),
       },
     });
   } catch (err) {

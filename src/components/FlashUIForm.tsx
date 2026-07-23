@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { SparklesIcon, RefreshIcon, CheckIcon, ArrowRightIcon } from "./icons";
+import { SparklesIcon, RefreshIcon, CheckIcon, ArrowRightIcon, ExternalLinkIcon } from "./icons";
 
 const SAMPLE_PROMPTS = [
-  "Přihlašovací formulář s tmavým motivem",
-  "Dashboard s 4 kartami metrik",
-  "Responsivní navigační menu s hamburgerem",
-  "Cenová tabulka se 3 sloupci",
-  "Karta produktu s obrázkem a tlačítkem",
-  "Chat rozhraní s bublinami zpráv",
+  "Premium dashboard s metrikama, sparklines a gold akcentem",
+  "Moderní přihlašovací stránka s glassmorphism efektem",
+  "Interaktivní cenová tabulka s 3 plány a hover efekty",
+  "Chatové rozhraní s bublinama, avatarama a timestampama",
 ];
 
 const ROTATING_TEXTS = [
@@ -23,11 +21,12 @@ const ROTATING_TEXTS = [
   "landing page",
 ];
 
-// Particle background component
+const DAILY_LIMIT = 5;
+
+// Particle background
 function ParticleBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      {/* Grid dots */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -35,7 +34,6 @@ function ParticleBackground() {
           backgroundSize: '40px 40px',
         }}
       />
-      {/* Glow orbs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-[0.08] blur-[100px] animate-pulse-slow"
         style={{ background: 'radial-gradient(circle, var(--gold), transparent 70%)' }}
       />
@@ -46,8 +44,8 @@ function ParticleBackground() {
   );
 }
 
-// Rotating text effect
-function RotatingPlaceholder({ currentPrompt, isActive }: { currentPrompt: string; isActive: boolean }) {
+// Rotating placeholder
+function RotatingPlaceholder({ isActive }: { isActive: boolean }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -61,25 +59,21 @@ function RotatingPlaceholder({ currentPrompt, isActive }: { currentPrompt: strin
   if (isActive) return null;
 
   return (
-    <span className="absolute left-5 top-4 text-sm pointer-events-none transition-all duration-500"
+    <span className="absolute left-5 top-4 text-sm pointer-events-none"
       style={{ color: 'var(--text-muted)' }}
     >
-      <span className="opacity-50">Napiš{"&#160;"}</span>
-      <span
-        key={index}
-        className="inline-block animate-typewriter"
-        style={{ color: 'var(--gold)' }}
-      >
+      <span className="opacity-50">Napiš </span>
+      <span key={index} className="inline-block animate-typewriter" style={{ color: 'var(--gold)' }}>
         {ROTATING_TEXTS[index]}
       </span>
     </span>
   );
 }
 
-// Loading animation with progress dots
-function LoadingAnimation({ html }: { html: string }) {
-  const lines = html.split('\n').length;
+// Loading state
+function LoadingState({ html }: { html: string }) {
   const chars = html.length;
+  const lines = html.split('\n').length;
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-20">
@@ -99,7 +93,6 @@ function LoadingAnimation({ html }: { html: string }) {
           {chars > 0 ? `${chars} znaků · ${lines} řádků` : 'Připravuji návrh...'}
         </p>
       </div>
-      {/* Progress bar */}
       <div className="w-48 h-1 rounded-full overflow-hidden"
         style={{ backgroundColor: 'var(--border)' }}
       >
@@ -116,27 +109,73 @@ function LoadingAnimation({ html }: { html: string }) {
   );
 }
 
+// Rate limit dots
+function RateLimitIndicator({ remaining }: { remaining: number }) {
+  const isLow = remaining <= 2;
+  return (
+    <div className="flex items-center gap-2 text-xs" style={{ color: isLow ? '#ef4444' : 'var(--text-muted)' }}>
+      <div className="flex gap-0.5">
+        {Array.from({ length: DAILY_LIMIT }).map((_, i) => (
+          <div
+            key={i}
+            className="w-1.5 h-1.5 rounded-full transition-all"
+            style={{
+              backgroundColor: i < remaining ? 'var(--gold)' : 'var(--border)',
+              opacity: i < remaining ? 1 : 0.3,
+            }}
+          />
+        ))}
+      </div>
+      <span>{remaining}/{DAILY_LIMIT} dnes</span>
+    </div>
+  );
+}
+
 export default function FlashUIForm() {
   const [prompt, setPrompt] = useState("");
-  const [generatedHtml, setGeneratedHtml] = useState("");
+  const [html, setHtml] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [showCode, setShowCode] = useState(false);
   const [hasResult, setHasResult] = useState(false);
+  const [limitRemaining, setLimitRemaining] = useState(DAILY_LIMIT);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      abortRef.current?.abort();
-    };
+  // Build complete HTML document for iframe
+  const buildPreviewHtml = useCallback((rawHtml: string) => {
+    if (!rawHtml.trim()) return '';
+
+    // If already complete document, return as-is
+    if (rawHtml.includes('<!DOCTYPE html>') || rawHtml.includes('<html>')) {
+      return rawHtml;
+    }
+
+    // Wrap incomplete HTML
+    return `<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #e5e5e5; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 2rem; }
+</style>
+</head>
+<body>
+${rawHtml}
+</body>
+</html>`;
   }, []);
 
-  // Scroll to result when ready
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
+
   useEffect(() => {
     if (hasResult && resultRef.current) {
       resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -150,7 +189,7 @@ export default function FlashUIForm() {
 
     setLoading(true);
     setError("");
-    setGeneratedHtml("");
+    setHtml("");
     setCopied(false);
     setShowCode(false);
     setHasResult(false);
@@ -166,23 +205,31 @@ export default function FlashUIForm() {
         signal: controller.signal,
       });
 
+      const remaining = res.headers.get("X-RateLimit-Remaining");
+      if (remaining) setLimitRemaining(parseInt(remaining));
+
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Nepodařilo se spojit s AI");
+        setError(res.status === 429
+          ? data.message || `Denní limit ${DAILY_LIMIT} vyčerpán. Zkus to zítra.`
+          : data.error || "Chyba při generování"
+        );
+        setLoading(false);
+        return;
       }
 
       const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
+      if (!reader) throw new Error("No stream");
 
       const decoder = new TextDecoder();
-      let html = "";
+      let accumulated = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        html += decoder.decode(value, { stream: true });
-        setGeneratedHtml(html);
+        accumulated += decoder.decode(value, { stream: true });
+        setHtml(accumulated);
       }
 
       setHasResult(true);
@@ -201,7 +248,7 @@ export default function FlashUIForm() {
   }
 
   function handleCopy() {
-    navigator.clipboard.writeText(generatedHtml).then(() => {
+    navigator.clipboard.writeText(html).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -209,7 +256,7 @@ export default function FlashUIForm() {
 
   function handleReset() {
     setPrompt("");
-    setGeneratedHtml("");
+    setHtml("");
     setError("");
     setCopied(false);
     setShowCode(false);
@@ -217,17 +264,14 @@ export default function FlashUIForm() {
     textareaRef.current?.focus();
   }
 
-  const handlePromptClick = useCallback((text: string) => {
-    setPrompt(text);
-    textareaRef.current?.focus();
-  }, []);
+  const previewHtml = buildPreviewHtml(html);
 
   return (
     <section className="relative min-h-[calc(100svh-80px)] flex flex-col">
       <ParticleBackground />
 
       <div className="relative z-10 flex-1 flex flex-col">
-        {/* Hero input area */}
+        {/* Input hero */}
         <div className={`flex-1 flex flex-col items-center justify-center px-5 transition-all duration-700 ${hasResult ? 'pt-10 pb-6' : 'py-20'}`}>
           {!hasResult && (
             <div className="text-center mb-8 animate-fade-in-up">
@@ -249,25 +293,20 @@ export default function FlashUIForm() {
             </div>
           )}
 
-          {/* Input */}
           <div className="w-full max-w-2xl">
             <div
               className="relative overflow-hidden rounded-2xl border transition-all duration-300 focus-within:border-gold/50 focus-within:shadow-[0_0_30px_rgba(200,150,46,0.1)]"
               style={{ borderColor: "var(--border)" }}
             >
               <div className="relative">
-                <RotatingPlaceholder currentPrompt={prompt} isActive={prompt.length > 0 || loading} />
+                <RotatingPlaceholder isActive={prompt.length > 0 || loading} />
                 <textarea
                   ref={textareaRef}
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={prompt.length === 0 ? "" : "Např. Přihlašovací formulář s tmavým motivem..."}
                   rows={hasResult ? 2 : 3}
                   className="w-full resize-none bg-transparent px-5 py-4 text-sm outline-none"
-                  style={{
-                    color: "var(--input-text)",
-                    caretColor: "var(--gold)",
-                  }}
+                  style={{ color: "var(--input-text)", caretColor: "var(--gold)" }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                       void handleGenerate();
@@ -280,27 +319,13 @@ export default function FlashUIForm() {
                 className="flex items-center justify-between border-t px-5 py-3"
                 style={{ borderColor: "var(--border)" }}
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    {loading ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <span className="relative flex h-2 w-2">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
-                          <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
-                        </span>
-                        Generování...
-                      </span>
-                    ) : (
-                      "⌘ + Enter"
-                    )}
-                  </span>
-                </div>
+                <RateLimitIndicator remaining={limitRemaining} />
 
                 <div className="flex gap-2">
                   {loading && (
                     <button
                       onClick={handleStop}
-                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:bg-white/5"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
                       style={{ color: "var(--text-muted)" }}
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
@@ -328,33 +353,24 @@ export default function FlashUIForm() {
               </div>
             </div>
 
-            {/* Sample prompty */}
             {!hasResult && !loading && (
               <div className="mt-6 animate-fade-in-up">
-                <p
-                  className="mb-3 text-xs uppercase tracking-wider text-center"
-                  style={{ color: "var(--text-muted)" }}
-                >
+                <p className="mb-3 text-xs uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>
                   Nebo zkus:
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {SAMPLE_PROMPTS.map((s) => (
                     <button
                       key={s}
-                      onClick={() => handlePromptClick(s)}
-                      className="group relative overflow-hidden rounded-full border px-4 py-2 text-xs transition-all duration-300 hover:border-gold/50 hover:shadow-[0_0_20px_rgba(200,150,46,0.1)]"
+                      onClick={() => { setPrompt(s); textareaRef.current?.focus(); }}
+                      className="rounded-full border px-4 py-2 text-xs transition-all hover:border-gold/50"
                       style={{
                         borderColor: "var(--tag-border)",
                         backgroundColor: "var(--tag-bg)",
                         color: "var(--tag-text)",
                       }}
                     >
-                      <span className="relative z-10">{s}</span>
-                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(200, 150, 46, 0.1), transparent)',
-                        }}
-                      />
+                      {s}
                     </button>
                   ))}
                 </div>
@@ -363,56 +379,45 @@ export default function FlashUIForm() {
           </div>
         </div>
 
-        {/* Loading state */}
+        {/* Loading */}
         {loading && !hasResult && (
           <div className="flex-1 flex items-center justify-center">
-            <LoadingAnimation html={generatedHtml} />
+            <LoadingState html={html} />
           </div>
         )}
 
         {/* Result */}
-        {hasResult && generatedHtml && (
+        {hasResult && previewHtml && (
           <div ref={resultRef} className="container-narrow pb-20 animate-fade-in">
-            {/* Result header */}
+            {/* Result toolbar */}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-                  Výsledek
+                  Náhled
                 </span>
                 <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
-                  {generatedHtml.length.toLocaleString()} znaků
+                  {html.length.toLocaleString()} znaků
                 </span>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:bg-white/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
                   style={{ color: copied ? "var(--gold)" : "var(--text-muted)" }}
                 >
-                  {copied ? (
-                    <>
-                      <CheckIcon size={12} />
-                      Zkopírováno
-                    </>
-                  ) : (
-                    <>
-                      <SparklesIcon size={12} />
-                      Kopírovat HTML
-                    </>
-                  )}
+                  {copied ? <><CheckIcon size={12} /> Zkopírováno</> : <><ExternalLinkIcon size={12} /> Kopírovat</>}
                 </button>
                 <button
                   onClick={() => setShowCode(!showCode)}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:bg-white/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
                   style={{ color: showCode ? "var(--gold)" : "var(--text-muted)" }}
                 >
-                  <SparklesIcon size={12} />
                   {showCode ? "Skrýt kód" : "Zobrazit kód"}
                 </button>
                 <button
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:bg-white/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
                   style={{ color: "var(--text-muted)" }}
                 >
                   <ArrowRightIcon size={12} className="rotate-[-135deg]" />
@@ -421,64 +426,45 @@ export default function FlashUIForm() {
               </div>
             </div>
 
-            {/* Preview */}
+            {/* Preview iframe */}
             <div
-              className="overflow-hidden rounded-2xl border shadow-2xl"
+              className="overflow-hidden rounded-2xl border"
               style={{
                 borderColor: "var(--border)",
-                boxShadow: '0 0 60px rgba(0, 0, 0, 0.5), 0 0 1px rgba(200, 150, 46, 0.2)',
+                boxShadow: '0 0 60px rgba(0, 0, 0, 0.5)',
               }}
             >
               <iframe
                 ref={iframeRef}
-                srcDoc={generatedHtml}
+                srcDoc={previewHtml}
                 className="w-full border-0"
-                style={{
-                  height: "500px",
-                  backgroundColor: "#0a0a0a",
-                }}
+                style={{ height: "500px", backgroundColor: "#0a0a0a" }}
                 title="Flash UI náhled"
-                sandbox="allow-scripts"
+                sandbox="allow-scripts allow-same-origin"
+                loading="lazy"
               />
             </div>
 
             {/* Code view */}
             {showCode && (
-              <div
-                className="mt-4 overflow-hidden rounded-2xl border animate-fade-in"
-                style={{ borderColor: "var(--border)" }}
-              >
-                <div
-                  className="flex items-center justify-between border-b px-4 py-2"
-                  style={{ borderColor: "var(--border)" }}
-                >
-                  <span className="text-[10px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-                    HTML
-                  </span>
-                  <span className="text-[10px] font-mono" style={{ color: "var(--text-muted)" }}>
-                    {generatedHtml.length.toLocaleString()} chars
-                  </span>
+              <div className="mt-4 overflow-hidden rounded-2xl border animate-fade-in" style={{ borderColor: "var(--border)" }}>
+                <div className="flex items-center justify-between border-b px-4 py-2" style={{ borderColor: "var(--border)" }}>
+                  <span className="text-[10px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>HTML</span>
+                  <span className="text-[10px] font-mono" style={{ color: "var(--text-muted)" }}>{html.length.toLocaleString()} chars</span>
                 </div>
                 <div className="p-4">
-                  <pre
-                    className="overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
-                    style={{
-                      backgroundColor: "var(--bg-primary)",
-                      color: "var(--text-secondary)",
-                    }}
+                  <pre className="overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
+                    style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-secondary)" }}
                   >
-                    <code>{generatedHtml}</code>
+                    <code>{html}</code>
                   </pre>
                 </div>
               </div>
             )}
 
-            {/* Quick actions */}
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <button
-                onClick={handleReset}
-                className="btn-apple btn-apple-secondary"
-              >
+            {/* Quick action */}
+            <div className="mt-6 flex justify-center">
+              <button onClick={handleReset} className="btn-apple btn-apple-secondary">
                 <SparklesIcon size={14} />
                 Generovat něco jiného
               </button>
@@ -486,10 +472,10 @@ export default function FlashUIForm() {
           </div>
         )}
 
+        {/* Error */}
         {error && (
           <div className="container-narrow pb-20">
-            <div
-              className="rounded-xl border p-4 text-sm animate-shake"
+            <div className="rounded-xl border p-4 text-sm animate-shake"
               style={{
                 borderColor: "rgba(239, 68, 68, 0.3)",
                 backgroundColor: "rgba(239, 68, 68, 0.08)",
@@ -497,7 +483,7 @@ export default function FlashUIForm() {
               }}
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">⚠️</span>
+                <span>⚠️</span>
                 <span className="font-medium">Chyba</span>
               </div>
               {error}
