@@ -55,7 +55,7 @@ export const apps: App[] = [
     emoji: "⚡",
     tagline: "Generuj UI komponenty z promptu",
     description:
-      "Napiš, co chceš za UI komponentu, a DeepSeek V4 Flash ji nakreslí v reálném čase. Tlačítka, formuláře, karty, dashboardy — cokoliv. Postavený na iframe sandboxu.",
+      "Napiš, co chceš za UI komponentu, a Qwen 2.5 ji nakreslí v reálném čase. Tlačítka, formuláře, karty, dashboardy — cokoliv. Postavený na Next.js API route + OpenRouter.",
     status: "beta",
     href: "/flash-ui",
     external: false,
