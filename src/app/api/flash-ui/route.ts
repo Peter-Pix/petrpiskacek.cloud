@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "deepseek/deepseek-v4-flash";
+const OLLAMA_URL = "https://ollama.com/api/chat";
+const MODEL = "deepseek-v4-flash";
 
 const SYSTEM_PROMPT = `Jsi expert na HTML/CSS/JS. Generuješ čistý, funkční HTML kód na základě zadání uživatele.
 
@@ -42,18 +42,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Chybí prompt." }, { status: 400 });
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = process.env.OLLAMA_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "Chybí API klíč." }, { status: 500 });
     }
 
-    const response = await fetch(OPENROUTER_URL, {
+    const response = await fetch(OLLAMA_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": "https://petrpiskacek.cloud",
-        "X-Title": "petrpiskacek.cloud Flash UI",
       },
       body: JSON.stringify({
         model: MODEL,
@@ -61,15 +59,17 @@ export async function POST(req: NextRequest) {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: prompt },
         ],
-        temperature: 0.3,
-        max_tokens: 4096,
         stream: true,
+        options: {
+          temperature: 0.3,
+          num_predict: 4096,
+        },
       }),
     });
 
     if (!response.ok) {
       const text = await response.text().catch(() => "");
-      console.error("OpenRouter error:", response.status, text.slice(0, 300));
+      console.error("Ollama error:", response.status, text.slice(0, 300));
       return NextResponse.json(
         { error: "AI služba není dostupná." },
         { status: 502 }
@@ -94,39 +94,34 @@ export async function POST(req: NextRequest) {
 
             buffer += decoder.decode(value, { stream: true });
 
+            // Ollama native streaming: each line is a JSON object
             const lines = buffer.split("\n");
             buffer = lines.pop() || "";
 
             for (const line of lines) {
-              if (line.startsWith("data: ")) {
-                const data = line.slice(6).trim();
-                if (data === "[DONE]") continue;
-
-                try {
-                  const parsed = JSON.parse(data);
-                  const content = parsed?.choices?.[0]?.delta?.content || "";
-                  if (content) {
-                    controller.enqueue(encoder.encode(content));
-                  }
-                } catch {
-                  // Skip malformed JSON
-                }
-              }
-            }
-          }
-
-          if (buffer.startsWith("data: ")) {
-            const data = buffer.slice(6).trim();
-            if (data !== "[DONE]") {
+              if (!line.trim()) continue;
               try {
-                const parsed = JSON.parse(data);
-                const content = parsed?.choices?.[0]?.delta?.content || "";
+                const parsed = JSON.parse(line);
+                const content = parsed?.message?.content || "";
                 if (content) {
                   controller.enqueue(encoder.encode(content));
                 }
               } catch {
-                // Skip
+                // Skip malformed JSON
               }
+            }
+          }
+
+          // Process remaining buffer
+          if (buffer.trim()) {
+            try {
+              const parsed = JSON.parse(buffer);
+              const content = parsed?.message?.content || "";
+              if (content) {
+                controller.enqueue(encoder.encode(content));
+              }
+            } catch {
+              // Skip
             }
           }
         } catch (err) {
