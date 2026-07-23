@@ -17,7 +17,7 @@ export default function FlashUIPage() {
           <span className="text-xs text-zinc-600">DeepSeek V4 Flash</span>
         </div>
         <iframe
-          src="/flash-ui/dist/index.html"
+          src="/flash-ui/index.html"
           className="w-full border-0"
           style={{ height: "calc(100vh - 100px)", borderRadius: "12px" }}
           title="Flash UI"
