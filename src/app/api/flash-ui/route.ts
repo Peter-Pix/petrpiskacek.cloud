@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "qwen/qwen-2.5-72b-instruct";
+const MODEL = "deepseek/deepseek-v4-flash";
 
 const SYSTEM_PROMPT = `Jsi expert na HTML/CSS/JS. Generuješ čistý, funkční HTML kód na základě zadání uživatele.
 
