@@ -631,6 +631,46 @@ html, body {
   animation: spin-slow 3s linear infinite;
 }
 
+/* Flash UI animations */
+@keyframes typewriter {
+  0% { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  20% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  80% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
+}
+
+.animate-typewriter {
+  animation: typewriter 2.5s ease-in-out forwards;
+}
+
+@keyframes progressShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.animate-progress-shimmer {
+  animation: progressShimmer 2s linear infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
 @keyframes siteSwitcherFadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
