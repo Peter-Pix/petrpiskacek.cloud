@@ -31,7 +31,7 @@ export const apps: App[] = [
     emoji: "📊",
     tagline: "Live monitoring AI infrastruktury",
     description:
-      "Streamlit dashboard s实时nými metrikami všech běžících AI služeb. Latence, vytížení, stav modelů. Postavený na Python + Streamlit, data z API endpointů.",
+      "Streamlit dashboard srealtimenými metrikami všech běžících AI služeb. Latence, vytížení, stav modelů. Postavený na Python + Streamlit, data z API endpointů.",
     status: "online",
     href: "https://dashboard.petrpiskacek.cloud",
     external: true,
