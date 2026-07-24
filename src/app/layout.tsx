@@ -39,11 +39,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "cs_CZ",
     url: defaultUrl,
+    images: [{ url: `${defaultUrl}/og-image.png`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "petrpiskacek.cloud — AI infrastruktura a experimenty",
     description: "Live AI Lab. Běžící AI služby, architektury, experimenty.",
+    images: [`${defaultUrl}/og-image.png`],
   },
 };
 
