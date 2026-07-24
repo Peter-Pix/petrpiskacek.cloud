@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 const terminalLines = [
   { text: "$ ./apps", delay: 600 },
-  { text: "> 4 online · 1 beta · 1 brzy", delay: 500 },
+  { text: "> 5 online · 2 beta · 1 brzy", delay: 500 },
   { text: "", delay: 300 },
   { text: "$ ./status", delay: 400 },
-  { text: "> Všechno běží.", delay: 500 },
+  { text: "> Systém stabilní. Všechno běží.", delay: 500 },
 ];
 
 export default function Hero() {
