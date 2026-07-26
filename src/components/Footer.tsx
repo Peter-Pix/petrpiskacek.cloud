@@ -18,7 +18,7 @@ export default function Footer() {
               className="inline-flex items-center gap-1 text-xs transition-colors hover:text-gold"
               style={{ color: "var(--text-muted)" }}
             >
-              .cz — kdo jsem
+              .cz
               <ExternalLinkIcon size={10} />
             </a>
             <a
@@ -28,7 +28,7 @@ export default function Footer() {
               className="inline-flex items-center gap-1 text-xs transition-colors hover:text-gold"
               style={{ color: "var(--text-muted)" }}
             >
-              .online — příběh
+              .online
               <ExternalLinkIcon size={10} />
             </a>
             <a
@@ -39,7 +39,6 @@ export default function Footer() {
               style={{ color: "var(--text-muted)" }}
             >
               <GithubIcon size={14} />
-              GitHub
             </a>
             <a
               href="mailto:ppix50@gmail.com"
@@ -47,7 +46,6 @@ export default function Footer() {
               style={{ color: "var(--text-muted)" }}
             >
               <MailIcon size={14} />
-              Email
             </a>
           </div>
         </div>
