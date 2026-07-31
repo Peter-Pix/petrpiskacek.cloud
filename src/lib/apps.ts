@@ -109,4 +109,16 @@ export const apps: App[] = [
     external: true,
     category: "ai",
   },
+  {
+    id: "terminall",
+    name: "Terminall",
+    emoji: "💻",
+    tagline: "Trénink příkazovýho řádku",
+    description:
+      "Uč se Linux, macOS a Windows příkazy v bezpečným virtuálním terminálu. Přepínej mezi OS, dělej chyby a AI učitel ti je vysvětlí. Virtuální filesystem, lekce, progress tracking. Běží na Ollama cloudu.",
+    status: "online",
+    href: "https://terminall-one.vercel.app",
+    external: true,
+    category: "tool",
+  },
 ];

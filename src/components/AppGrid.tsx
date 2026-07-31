@@ -25,6 +25,7 @@ const stackLabels: Record<string, string> = {
   "4rap": "Next.js · MDX · D3",
   scrollo: "Vanilla JS · PWA",
   "voice-demo": "—",
+  terminall: "Vite · React · Ollama",
 };
 
 export default function AppGrid() {
