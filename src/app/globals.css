@@ -10,6 +10,7 @@
   --gold-light: #e4b44a;
   /* Dark (default) */
   --bg: #09090b;
+  --bg-primary: #111113;
   --bg-secondary: #18181b;
   --surface: rgba(255, 255, 255, 0.04);
   --surface-strong: rgba(9, 9, 11, 0.88);
@@ -427,6 +428,35 @@ body {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
+/* Scroll fade — decentní, jednou, bez AOS knihovny */
+.scroll-fade {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s ease-out forwards;
+  animation-timeline: view();
+  animation-range: entry 0% entry 40%;
+}
+
+/* Scroll fade pair — animace na celý blok, ne na jednotlivé texty */
+.scroll-fade-pair {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-timeline: view();
+  animation-range: entry 0% entry 30%;
+}
+
+@supports not (animation-timeline: view()) {
+  .scroll-fade {
+    opacity: 1;
+    transform: none;
+  }
+  .scroll-fade-pair {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .animate-pulse-slow {
   animation: pulse 3s ease-in-out infinite;
 }
@@ -514,13 +544,14 @@ html, body {
   padding-top: env(safe-area-inset-top);
 }
 
-/* Terminal cursor */
+/* Terminal cursor — úzký, jako na petrpiskacek.cz */
 .terminal-cursor {
   display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
+  width: 0.08em;
+  height: 1em;
   background-color: var(--gold);
   vertical-align: text-bottom;
+  margin-left: 0.05em;
   animation: blink 1s step-end infinite;
 }
 
@@ -669,6 +700,18 @@ html, body {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Terminal glitch — decentní, skoro nepostřehnutelný */
+@keyframes terminalGlitch {
+  0%, 95%, 100% { transform: translate(0, 0); }
+  96% { transform: translate(-0.5px, 0.5px); }
+  97% { transform: translate(0.5px, -0.3px); }
+  98% { transform: translate(-0.3px, 0); }
+}
+
+.animate-glitch {
+  animation: terminalGlitch 8s ease-in-out infinite;
 }
 
 @keyframes siteSwitcherFadeIn {

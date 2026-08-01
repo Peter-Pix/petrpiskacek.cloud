@@ -1,123 +1,258 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { Block, BlockKind } from "@/lib/sparring-types";
+import { Ollama } from "ollama";
+import { MODELS, OPENROUTER_URL } from "@/lib/models";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const OLLAMA_MODEL = MODELS.sparring;
+const OPENROUTER_MODEL = "google/gemini-2.5-flash";
+const DAILY_LIMIT = 5;
 
-const BLOCK_SCHEMAS: Record<BlockKind, string> = {
-  core: `Vrať JSON:
-{
-  "what": "1 věta (max 12 slov) - co to je",
-  "forWhom": "1 věta (max 12 slov) - pro koho",
-  "mainFeature": "1 věta (max 15 slov) - hlavní feature"
-}`,
-  stack: `Vrať JSON:
-{
-  "frontend": "1-2 slova (např. 'Next.js')",
-  "backend": "1-2 slova (např. 'FastAPI')",
-  "database": "1-2 slova (např. 'Postgres + pgvector')",
-  "ai": "1-2 slova (např. 'Claude Sonnet' nebo 'lokální LLM')",
-  "infra": "1-2 slova (např. 'Vercel + Railway')"
-}`,
-  costs: `Vrať JSON:
-{
-  "oneTime": "1-2 krátké věty - implementace (max 20 slov)",
-  "monthly": "1-2 krátké věty - měsíční provoz (max 20 slov)",
-  "mvp": "1-2 krátké věty - MVP scope (max 20 slov)",
-  "note": "1 věta (volitelné) - důležitá poznámka"
-}`,
-  timeline: `Vrať JSON:
-{
-  "phase1": "1-2 krátké věty - fáze 1, 1-2 týdny (max 20 slov)",
-  "phase2": "1-2 krátké věty - fáze 2, 2-4 týdny (max 20 slov)",
-  "phase3": "1-2 krátké věty - fáze 3, 1+ měsíc (max 20 slov)"
-}`,
+const ipUsage = new Map<string, { count: number; date: string }>();
+
+function getClientIP(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetDate: string } {
+  const today = new Date().toISOString().split("T")[0];
+  const record = ipUsage.get(ip);
+  if (!record || record.date !== today) {
+    ipUsage.set(ip, { count: 1, date: today });
+    return { allowed: true, remaining: DAILY_LIMIT - 1, resetDate: today };
+  }
+  if (record.count >= DAILY_LIMIT) {
+    return { allowed: false, remaining: 0, resetDate: today };
+  }
+  record.count++;
+  return { allowed: true, remaining: DAILY_LIMIT - record.count, resetDate: today };
+}
+
+const BLOCK_SCHEMAS: Record<string, Record<string, string>> = {
+  core: {
+    what: "1 věta — CO to je",
+    forWhom: "1 věta — PRO KOHO",
+    mainFeature: "1 věta — HLAVNÍ FEATURE",
+  },
+  stack: {
+    frontend: "doporučený frontend stack",
+    backend: "doporučený backend stack",
+    database: "doporučená databáze",
+    ai: "AI komponenty",
+    infra: "infrastruktura a hosting",
+  },
+  costs: {
+    oneTime: "jednorázové náklady na implementaci",
+    monthly: "měsíční provozní náklady",
+    mvp: "MVP scope a odhad",
+    note: "volitelná doplňující poznámka",
+  },
+  timeline: {
+    prvniFaze: "1-2 týdny — první fáze",
+    druhaFaze: "2-4 týdny — druhá fáze",
+    tretiFaze: "1+ měsíc — třetí fáze",
+  },
 };
 
-const BASE_SYSTEM = `Jsi Sparring — AI architekt, co mluví jako člověk z oboru. Ne korporát.
-Hlas: přímý, vtipný, konkrétní. Žádné fráze typu "komplexní", "robustní", "enterprise-grade".
+function buildSystemPrompt(blockKind: string, prompt: string, answers: Record<string, string>): string {
+  const schema = BLOCK_SCHEMAS[blockKind];
+  if (!schema) throw new Error(`Neznámý typ bloku: ${blockKind}`);
 
-PRAVIDLA PRO VŠECHNY BLOKY:
-- KRÁTKÉ VĚTY. Každá hodnota max 12-20 slov, NE ODSTAVEC.
-- Buď KONKRÉTNÍ. "Postgres", ne "relační databáze". "Next.js", ne "moderní frontend framework".
-- PŘIZPŮSOB zadání a odpovědím. Pokud user řekl "malá firma do 20 lidí", nepíšeš enterprise řešení.
-- PŘEMÝŠLEJ jako architekt v hospodě. Co bys poradil zkušenému kolegovi?
+  const fields = Object.entries(schema)
+    .map(([key, desc]) => `"${key}": "${desc}"`)
+    .join(",\n    ");
 
-`;
+  return `Jsi expert na business analýzu. MLUV ČESKY. VŽDY ODPOVÍDEJ ČESKY. Generuj strukturovaný blok typu "${blockKind}" pro projekt: ${prompt}.
+
+Odpovědi na doplňující otázky: ${JSON.stringify(answers)}.
+
+Vrať POUZE validní JSON objekt bez jakéhokoliv textu, formátování nebo markdownu. Všechny hodnoty piš ČESKY:
+{
+  "kind": "${blockKind}",
+  ${fields}
+}
+
+Každá hodnota musí být string. Žádný další text, žádné vysvětlivky, jen JSON.`;
+}
+
+function validateBlock(data: unknown, blockKind: string): boolean {
+  if (!data || typeof data !== "object") return false;
+  const obj = data as Record<string, unknown>;
+  if (obj.kind !== blockKind) return false;
+
+  const schema = BLOCK_SCHEMAS[blockKind];
+  if (!schema) return false;
+
+  for (const key of Object.keys(schema)) {
+    if (typeof obj[key] !== "string" || !(obj[key] as string).trim()) return false;
+  }
+  return true;
+}
+
+function safeParseJSON(text: string): unknown {
+  // Zkus parsovat rovnou
+  try {
+    return JSON.parse(text);
+  } catch {
+    // Zkus najít JSON v textu (model občas přidá markdown nebo text)
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch {
+        // nothing
+      }
+    }
+    return null;
+  }
+}
+
+async function callOllama(prompt: string, answers: Record<string, string>, blockKind: string): Promise<unknown> {
+  const ollama = new Ollama({
+    host: 'https://ollama.com',
+    headers: { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` },
+  });
+
+  const systemPrompt = buildSystemPrompt(blockKind, prompt, answers);
+
+  const response = await ollama.generate({
+    model: OLLAMA_MODEL,
+    prompt: systemPrompt,
+    stream: false,
+    format: 'json',
+  });
+
+  const parsed = safeParseJSON(response.response);
+  if (!parsed) {
+    throw new Error(`Ollama nevrátila validní JSON: ${response.response.slice(0, 200)}`);
+  }
+
+  if (!validateBlock(parsed, blockKind)) {
+    throw new Error(`Ollama vrátila nevalidní strukturu bloku: ${JSON.stringify(parsed).slice(0, 200)}`);
+  }
+
+  return parsed;
+}
+
+async function callOpenRouter(prompt: string, answers: Record<string, string>, blockKind: string): Promise<unknown> {
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  if (!openRouterKey) throw new Error("OpenRouter API key není nastaven");
+
+  const systemPrompt = buildSystemPrompt(blockKind, prompt, answers);
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${openRouterKey}`,
+    },
+    body: JSON.stringify({
+      model: OPENROUTER_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "unknown");
+    throw new Error(`OpenRouter vrátil ${res.status}: ${errText.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) throw new Error("OpenRouter nevrátil žádný obsah");
+
+  const parsed = safeParseJSON(content);
+  if (!parsed) {
+    throw new Error(`OpenRouter nevrátila validní JSON: ${content.slice(0, 200)}`);
+  }
+
+  if (!validateBlock(parsed, blockKind)) {
+    throw new Error(`OpenRouter vrátila nevalidní strukturu bloku: ${JSON.stringify(parsed).slice(0, 200)}`);
+  }
+
+  return parsed;
+}
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting
+    const ip = getClientIP(req);
+    const limit = checkRateLimit(ip);
+
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          error: "Denní limit vyčerpán.",
+          message: "Můžeš generovat max 5x denně. Zkus to zítra.",
+          limit: DAILY_LIMIT,
+          remaining: 0,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(DAILY_LIMIT),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": limit.resetDate,
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const { prompt, answers, blockKind } = body;
 
-    if (!prompt || typeof prompt !== "string") {
-      return NextResponse.json({ error: "Chybí zadání." }, { status: 400 });
+    if (!prompt) {
+      return NextResponse.json({ error: "Chybí prompt." }, { status: 400 });
     }
-    if (!blockKind || !["core", "stack", "costs", "timeline"].includes(blockKind)) {
-      return NextResponse.json({ error: "Neplatný typ bloku." }, { status: 400 });
-    }
-
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "Chybí API klíč." }, { status: 500 });
+    if (!blockKind || !BLOCK_SCHEMAS[blockKind]) {
+      return NextResponse.json({ error: `Neznámý typ bloku: ${blockKind}` }, { status: 400 });
     }
 
-    // Sestavení kontextu pro AI
-    const answersText = answers && Object.keys(answers).length > 0
-      ? `\n\nDoplňující odpovědi:\n${Object.entries(answers).map(([k, v]) => `- ${k}: ${v}`).join("\n")}`
-      : "";
-
-    const userContent = `Zadání: ${prompt}${answersText}\n\nVygeneruj BLOK: ${blockKind.toUpperCase()}\n\n${BLOCK_SCHEMAS[blockKind as BlockKind]}`;
-
-    const response = await fetch(OPENROUTER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": "https://petrpiskacek.cloud",
-        "X-Title": "petrpiskacek.cloud Sparring",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: BASE_SYSTEM },
-          { role: "user", content: userContent },
-        ],
-        temperature: 0.5,
-        max_tokens: 400,
-        response_format: { type: "json_object" },
-      }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text().catch(() => "");
-      console.error("OpenRouter error (block):", response.status, text.slice(0, 300));
-      return NextResponse.json({ error: "AI služba není dostupná." }, { status: 502 });
-    }
-
-    const data = await response.json();
-    const content = data?.choices?.[0]?.message?.content;
-    if (typeof content !== "string" || !content.trim()) {
-      return NextResponse.json({ error: "Prázdná odpověď." }, { status: 502 });
-    }
-
-    let parsed: Block;
+    // 1. Attempt Ollama Cloud
     try {
-      parsed = JSON.parse(content);
-    } catch {
-      console.error("Block parse error:", content.slice(0, 300));
-      return NextResponse.json({ error: "Nepodařilo se parsovat blok." }, { status: 502 });
+      const block = await callOllama(prompt, answers, blockKind);
+      return NextResponse.json({ block }, {
+        headers: {
+          "X-RateLimit-Limit": String(DAILY_LIMIT),
+          "X-RateLimit-Remaining": String(limit.remaining),
+        },
+      });
+    } catch (ollamaErr) {
+      console.error("Ollama failed:", ollamaErr);
     }
 
-    // Validace: blok musí mít kind
-    if (!parsed || typeof parsed !== "object") {
-      return NextResponse.json({ error: "Neplatný formát bloku." }, { status: 502 });
+    // 2. Fallback to OpenRouter
+    try {
+      const block = await callOpenRouter(prompt, answers, blockKind);
+      return NextResponse.json({ block }, {
+        headers: {
+          "X-RateLimit-Limit": String(DAILY_LIMIT),
+          "X-RateLimit-Remaining": String(limit.remaining),
+        },
+      });
+    } catch (orErr) {
+      console.error("OpenRouter fallback failed:", orErr);
     }
-    parsed.kind = blockKind;
 
-    return NextResponse.json({ block: parsed });
+    // 3. Both failed
+    return NextResponse.json(
+      { error: "AI služba není dostupná. Zkus to prosím později." },
+      {
+        status: 502,
+        headers: {
+          "X-RateLimit-Limit": String(DAILY_LIMIT),
+          "X-RateLimit-Remaining": String(limit.remaining),
+        },
+      }
+    );
   } catch (err) {
-    console.error("Block API error:", err);
-    return NextResponse.json({ error: "Něco se pokazilo." }, { status: 500 });
+    console.error("Block API critical error:", err);
+    return NextResponse.json(
+      { error: "AI služba není dostupná. Zkus to prosím později." },
+      { status: 502 }
+    );
   }
 }

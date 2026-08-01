@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
+import Link from "next/link";
 import { apps, type App } from "@/lib/apps";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
@@ -10,211 +11,186 @@ const statusLabels: Record<string, { label: string; color: string }> = {
   soon: { label: "Brzy", color: "var(--text-muted)" },
 };
 
-const categoryLabels: Record<string, string> = {
-  ai: "AI",
-  tool: "Nástroj",
-  demo: "Demo",
-  data: "Data",
-};
-
-const stackLabels: Record<string, string> = {
-  karel: "Vite · React · Ollama",
-  dashboard: "Python · Streamlit",
-  sparring: "Next.js · Ollama",
-  "flash-ui": "Next.js · DeepSeek V4",
-  "4rap": "Next.js · MDX · D3",
-  scrollo: "Vanilla JS · PWA",
-  "voice-demo": "—",
-  terminall: "Vite · React · Ollama",
+const STORIES: Record<string, { hook: string; body: string }> = {
+  karel: {
+    hook: "Přijde e-mail, Karel se stará.",
+    body: "Rozpozná, co je důležitý. Roztřídí, co není. Odpoví, když ty nemůžeš. Sekretář bez výmluv.",
+  },
+  dashboard: {
+    hook: "Pořád se něco děje.",
+    body: "Latence, vytížení, stav modelů — všechno na jednom místě v reálným čase. Víš, kdy něco p",
+  },
+  sparring: {
+    hook: "Víc hlav víc ví.",
+    body: "Napíšeš nápad. AI se doptá. Pak dostaneš stack, cenu a plán. Ne vágní rady — konkrétní čtyři bloky, který jdou rovnou do akce.",
+  },
+  "flash-ui": {
+    hook: "Design na dotek.",
+    body: "Napiš, co chceš. Uvidíš to za sekundu. Žádný šablony, žádný copy-paste — každej návrh vzniká live, pro tebe.",
+  },
+  "4rap": {
+    hook: "Za hranicí hudby.",
+    body: "1699 jmen. 9281 vazeb. Kdo s kým, kdo kde, co kdy vyšlo. Největší mapa českýho rapu — a pořád roste.",
+  },
+  scrollo: {
+    hook: "Rychlý, chytrý, levný.",
+    body: "Nástroje, který prostě fungujou. V prohlížeči, offline, bez reklam. Nic víc. Nic míň.",
+  },
+  docbot: {
+    hook: "Šikovný úředník.",
+    body: "NDA, nájemka, pracovní smlouva — chat tě provede, výsledek zkontroluje na rizika. Hotovo dřív, než bys našel právníka.",
+  },
+  terminall: {
+    hook: "Vítej v Matrixu.",
+    body: "Bezpečný terminál, kde se smí chybovat. AI ti každou chybu vysvětlí. Od ls po docker — na Linuxu, Macu i Windows.",
+  },
 };
 
 export default function AppGrid() {
-  const [filter, setFilter] = useState<string | null>(null);
-
-  const filtered = filter
-    ? apps.filter((a) => a.category === filter)
-    : apps;
-
-  const onlineApps = filtered.filter((a) => a.status !== "soon");
-  const soonApps = filtered.filter((a) => a.status === "soon");
-
   return (
     <section id="apps" className="section-apple">
       <div className="container-apple">
-        <p className="eyebrow mb-3 text-center">AI Playground</p>
-        <h2 className="headline-lg mb-4 text-center">
-          Aplikace
-        </h2>
-        <p className="subhead mx-auto mb-12 max-w-xl text-center">
-          Každá appka běží naostro. Klikni a vyzkoušej.
-        </p>
-
-        {/* Kategorie filtry — App Store styl */}
-        <div className="mb-10 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => setFilter(null)}
-            className="rounded-full border px-4 py-1.5 text-xs font-medium transition-all"
-            style={{
-              borderColor: !filter ? "var(--gold)" : "var(--tag-border)",
-              backgroundColor: !filter ? "rgba(200, 150, 46, 0.1)" : "var(--tag-bg)",
-              color: !filter ? "var(--gold)" : "var(--tag-text)",
-            }}
-          >
-            Všechny
-            <span className="ml-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
-              {apps.length}
-            </span>
-          </button>
-          {Object.entries(categoryLabels).map(([key, label]) => {
-            const count = apps.filter((a) => a.category === key).length;
-            if (count === 0) return null;
-            return (
-              <button
-                key={key}
-                onClick={() => setFilter(key)}
-                className="rounded-full border px-4 py-1.5 text-xs font-medium transition-all"
-                style={{
-                  borderColor: filter === key ? "var(--gold)" : "var(--tag-border)",
-                  backgroundColor: filter === key ? "rgba(200, 150, 46, 0.1)" : "var(--tag-bg)",
-                  color: filter === key ? "var(--gold)" : "var(--tag-text)",
-                }}
-              >
-                {label}
-                <span className="ml-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+        <div className="space-y-24">
+          {apps.map((app, idx) => (
+            <AppFeature key={app.id} app={app} index={idx} />
+          ))}
         </div>
-
-        {/* Online / Beta appky */}
-        {onlineApps.length > 0 && (
-          <>
-            <div className="mb-6 flex items-center gap-3">
-              <h3 className="text-sm font-semibold">Dostupné</h3>
-              <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
-            </div>
-            <div className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {onlineApps.map((app) => (
-                <AppCard key={app.id} app={app} />
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* Brzy appky */}
-        {soonApps.length > 0 && (
-          <>
-            <div className="mb-6 flex items-center gap-3">
-              <h3 className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>
-                Chystá se
-              </h3>
-              <div className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {soonApps.map((app) => (
-                <AppCard key={app.id} app={app} />
-              ))}
-            </div>
-          </>
-        )}
       </div>
     </section>
   );
 }
 
-function AppCard({ app }: { app: App }) {
+function AppFeature({ app, index }: { app: App; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const story = STORIES[app.id] || { hook: app.tagline, body: app.description };
   const status = statusLabels[app.status];
-  const stack = stackLabels[app.id] || "";
+  const isEven = index % 2 === 0;
 
-  const CardTag = app.href && app.href !== "#" ? "a" : "div";
-  const cardProps = app.href && app.href !== "#"
-    ? {
-        href: app.href,
-        ...(app.external ? { target: "_blank", rel: "noopener noreferrer" } : {}),
-      }
-    : {};
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
 
   return (
-    <CardTag
-      {...cardProps}
-      className="group glass-card flex flex-col p-5 transition-all duration-200 hover:scale-[1.02]"
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+      }`}
     >
-      {/* Header s emoji + status badge */}
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl text-xl"
-            style={{ backgroundColor: "var(--tag-bg)" }}
-          >
-            {app.emoji}
-          </span>
-          <div>
-            <h3 className="text-sm font-semibold">{app.name}</h3>
-            <p className="text-xs" style={{ color: "var(--gold)" }}>
-              {app.tagline}
-            </p>
+      <div
+        className={`flex flex-col gap-8 md:gap-12 ${
+          isEven ? "md:flex-row" : "md:flex-row-reverse"
+        }`}
+      >
+        <div className="flex-1 space-y-4 md:space-y-6">
+          <div className="flex items-center gap-3">
+            <div>
+              <h3 className="text-lg font-semibold md:text-xl">{app.name}</h3>
+              <span
+                className="inline-flex items-center gap-1.5 text-xs"
+                style={{ color: status.color }}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: status.color }}
+                />
+                {status.label}
+              </span>
+            </div>
           </div>
+
+          <p
+            className="text-2xl font-light leading-tight tracking-tight md:text-3xl lg:text-4xl"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {story.hook}
+          </p>
+
+          <p
+            className="text-sm leading-relaxed md:text-base"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            {story.body}
+          </p>
+
+          {app.href && app.href !== "#" && (
+            <AppLink
+              href={app.href}
+              external={app.external}
+              label={buttonLabel}
+            />
+          )}
         </div>
-        <span
-          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium whitespace-nowrap"
-          style={{
-            backgroundColor: app.status === "online"
-              ? "rgba(16, 185, 129, 0.1)"
-              : app.status === "beta"
-                ? "rgba(200, 150, 46, 0.1)"
-                : "rgba(113, 113, 122, 0.1)",
-            color: status.color,
-          }}
-        >
-          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: status.color }} />
-          {status.label}
-        </span>
-      </div>
 
-      {/* Description — delší, App Store styl */}
-      <p className="flex-1 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-        {app.description}
-      </p>
-
-      {/* Metadata row — stack + kategorie */}
-      <div className="mt-4 flex items-center gap-2">
-        {stack && (
-          <span className="rounded-md px-2 py-0.5 text-[10px] font-mono"
-            style={{ backgroundColor: "var(--tag-bg)", color: "var(--text-muted)" }}
-          >
-            {stack}
-          </span>
-        )}
-        <span className="text-[10px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-          {categoryLabels[app.category]}
-        </span>
+        <div className="flex-1" />
       </div>
+    </div>
+  );
+}
 
-      {/* CTA — App Store "Get" button styl */}
-      <div className="mt-4">
-        {app.href && app.href !== "#" ? (
-          <span
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style={{
-              backgroundColor: "rgba(200, 150, 46, 0.15)",
-              color: "var(--gold)",
-            }}
-          >
-            {app.external ? "Otevřít" : "Spustit"}
-          </span>
-        ) : (
-          <span
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold"
-            style={{
-              backgroundColor: "var(--tag-bg)",
-              color: "var(--text-muted)",
-            }}
-          >
-            Příprava
-          </span>
-        )}
-      </div>
-    </CardTag>
+/**
+ * AppLink — vybere správný typ odkazu.
+ * Interní appky → next/link (client-side routing, prefetch).
+ * Externí appky → <a target="_blank"> (no opener, no referrer).
+ * Žádný href → nic.
+ */
+function AppLink({
+  href,
+  external,
+  label,
+}: {
+  href: string;
+  external: boolean;
+  label: string;
+}) {
+  const className =
+    "group inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all";
+  const style = {
+    backgroundColor: "rgba(200, 150, 46, 0.12)",
+    color: "var(--gold)",
+  };
+  const arrow = (
+    <span className="transition-transform duration-200 group-hover:translate-x-1">
+      →
+    </span>
+  );
+
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        style={style}
+      >
+        <span>{label}</span>
+        {arrow}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className} style={style}>
+      <span>{label}</span>
+      {arrow}
+    </Link>
   );
 }

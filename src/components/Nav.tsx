@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { MenuIcon, CloseIcon } from "./icons";
 import SiteSwitcher from "./SiteSwitcher";
 
@@ -20,9 +21,9 @@ export default function Nav() {
       <ul className="hidden items-center gap-8 md:flex">
         {links.map((link) => (
           <li key={link.href}>
-            <a href={link.href} className="link-apple">
+            <Link href={link.href} className="link-apple">
               {link.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
@@ -51,14 +52,14 @@ export default function Nav() {
           <ul className="flex flex-col gap-5">
             {links.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className="block text-lg font-medium"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

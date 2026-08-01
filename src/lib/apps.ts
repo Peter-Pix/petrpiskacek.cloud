@@ -16,7 +16,7 @@ export const apps: App[] = [
   {
     id: "karel",
     name: "Karel Robot",
-    emoji: "🤖",
+    emoji: "",
     tagline: "AI e-mailovej administrátor",
     description:
       "Pošli mu e-mail a on ho analyzuje, roztřídí a napíše odpověď. Umí rozpoznat urgentní zprávy, faktury, newslettery a osobní poštu. Běží na Ollama cloudu, frontend ve Vite + React.",
@@ -28,10 +28,10 @@ export const apps: App[] = [
   {
     id: "dashboard",
     name: "Dashboard",
-    emoji: "📊",
+    emoji: "",
     tagline: "Live monitoring AI infrastruktury",
     description:
-      "Streamlit dashboard srealtimenými metrikami všech běžících AI služeb. Latence, vytížení, stav modelů. Postavený na Python + Streamlit, data z API endpointů.",
+      "Streamlit dashboard se realtime metrikami všech běžících AI služeb. Latence, vytížení, stav modelů. Postavený na Python + Streamlit, data z API endpointů.",
     status: "online",
     href: "https://dashboard.petrpiskacek.cloud",
     external: true,
@@ -40,7 +40,7 @@ export const apps: App[] = [
   {
     id: "sparring",
     name: "Sparring",
-    emoji: "🥊",
+    emoji: "",
     tagline: "AI konzultant na projekty",
     description:
       "Napíšeš nápad, AI se doptá na detaily, pak ti nacení, navrhne technologickej stack a časovej plán. 4 bloky: jádro, stack, náklady, postup. Každej blok jde rozvést.",
@@ -52,7 +52,7 @@ export const apps: App[] = [
   {
     id: "flash-ui",
     name: "Flash UI",
-    emoji: "⚡",
+    emoji: "",
     tagline: "Generuj UI komponenty z promptu",
     description:
       "Napiš, co chceš za UI komponentu, a DeepSeek V4 Flash ji nakreslí v reálném čase. Tlačítka, formuláře, karty, dashboardy — cokoliv. Postavený na Next.js API route + OpenRouter.",
@@ -64,7 +64,7 @@ export const apps: App[] = [
   {
     id: "4rap",
     name: "4rap.cz",
-    emoji: "🎵",
+    emoji: "",
     tagline: "Znalostní databáze českýho rapu",
     description:
       "1699 entit, 9281 vazeb. Interaktivní D3 graf, full-text search, Schema.org SEO. Každej interpret, album, label a jejich propojení. Next.js + MDX, buildí 1200+ stránek.",
@@ -76,7 +76,7 @@ export const apps: App[] = [
   {
     id: "scrollo",
     name: "Scrollo",
-    emoji: "🛠️",
+    emoji: "",
     tagline: "Užitečný nástroje bez reklam",
     description:
       "Kolekce client-side nástrojů — převodníky, generátory, analyzátory. Všechno běží v prohlížeči, žádný data se neukládají na server. PWA, offline-ready, zero tracking.",
@@ -86,21 +86,9 @@ export const apps: App[] = [
     category: "tool",
   },
   {
-    id: "voice-demo",
-    name: "Voice Clone",
-    emoji: "🎤",
-    tagline: "7. generace hlasovýho klonu",
-    description:
-      "Můj vlastní hlas klonovanej do AI. Sedmá generace — k nerozeznání od originálu. Model umí zpívat i rapovat. WebRTC demo připravujeme.",
-    status: "soon",
-    href: "#",
-    external: false,
-    category: "demo",
-  },
-  {
     id: "docbot",
     name: "DocBot",
-    emoji: "📝",
+    emoji: "",
     tagline: "AI právník na český smlouvy",
     description:
       "Postaví ti NDA, nájemní nebo pracovní smlouvu podle českého práva. Chatem tě provede krok za krokem, pak smlouvu zkontroluje na právní rizika. DeepSeek V4 Flash backend, Vite + React frontend.",
@@ -112,7 +100,7 @@ export const apps: App[] = [
   {
     id: "terminall",
     name: "Terminall",
-    emoji: "💻",
+    emoji: "",
     tagline: "Trénink příkazovýho řádku",
     description:
       "Uč se Linux, macOS a Windows příkazy v bezpečným virtuálním terminálu. Přepínej mezi OS, dělej chyby a AI učitel ti je vysvětlí. Virtuální filesystem, lekce, progress tracking. Běží na Ollama cloudu.",

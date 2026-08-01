@@ -30,9 +30,9 @@ export type CostsBlock = {
 
 export type TimelineBlock = {
   kind: "timeline";
-  phase1: string; // 1-2 týdny
-  phase2: string; // 2-4 týdny
-  phase3: string; // 1+ měsíc
+  prvniFaze: string; // 1-2 týdny
+  druhaFaze: string; // 2-4 týdny
+  tretiFaze: string; // 1+ měsíc
 };
 
 export type Block = CoreBlock | StackBlock | CostsBlock | TimelineBlock;

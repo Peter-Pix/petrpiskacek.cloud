@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { SparklesIcon, CpuIcon } from "./icons";
 
 interface Section {
@@ -241,10 +242,30 @@ export default function ChallengeForm() {
   );
 }
 
+/**
+ * Markdown → HTML s DOMPurify sanitizací.
+ *
+ * Pipeline:
+ * 1. Markdown → HTML (naše parsování)
+ * 2. DOMPurify všechno nepovolené odstraní (XSS ochrana)
+ *
+ * DOMPurify místo manuálního escapování je bezpečnější:
+ * - chytí všechny XSS vzory včetně mutation XSS
+ * - povolí jen bezpečné tagy/attrs
+ * - konfigurovatelný whitelist
+ */
 function formatContent(text: string): string {
-  // Convert markdown-like syntax to HTML
-  return text
+  // 1. Markdown → HTML
+  const markdownHtml = text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`(.*?)`/g, "<code style='background:var(--tag-bg);padding:1px 4px;border-radius:3px;font-size:0.9em'>$1</code>")
+    .replace(/`(.*?)`/g, "<code>$1</code>")
     .replace(/\n/g, "<br/>");
+
+  // 2. DOMPurify — whitelist, vše ostatní odstraní
+  // Povolujeme jen úplný základ: <strong>, <code>, <br>, <em>, <a> s href.
+  return DOMPurify.sanitize(markdownHtml, {
+    ALLOWED_TAGS: ["strong", "code", "br", "em", "b", "i", "a"],
+    ALLOWED_ATTR: ["href"],
+    ALLOWED_URI_REGEXP: /^https?:\/\//i,
+  });
 }

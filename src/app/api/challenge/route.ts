@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "anthropic/claude-sonnet-5";
+import { MODELS, OPENROUTER_URL } from "@/lib/models";
 
 const SYSTEM_PROMPT = `Jsi AI solution architect. Generuješ kompletní návrh AI řešení na základě zadání uživatele.
 
@@ -50,7 +48,7 @@ export async function POST(req: NextRequest) {
         "X-Title": "petrpiskacek.cloud Challenge",
       },
       body: JSON.stringify({
-        model: MODEL,
+        model: MODELS.challenge,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: prompt },

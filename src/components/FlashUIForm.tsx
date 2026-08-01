@@ -1,13 +1,24 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { SparklesIcon, RefreshIcon, CheckIcon, ArrowRightIcon, ExternalLinkIcon } from "./icons";
+import { SparklesIcon, RefreshIcon, CheckIcon, ExternalLinkIcon } from "./icons";
 
-const SAMPLE_PROMPTS = [
+const RANDOM_PROMPTS = [
   "Premium dashboard s metrikama, sparklines a gold akcentem",
   "Moderní přihlašovací stránka s glassmorphism efektem",
   "Interaktivní cenová tabulka s 3 plány a hover efekty",
   "Chatové rozhraní s bublinama, avatarama a timestampama",
+  "Firemní landing page s hero sekcí, logem a CTA tlačítkem",
+  "Temný admin panel s postranním menu a grafy",
+  "Karta produktu s obrázkem, cenou a hodnocením hvězdičkami",
+  "Newsletter přihlašovací formulář s moderním designem",
+  "Timeline komponenta pro zobrazení milníků projektu",
+  "Testimonials carousel s avatarama a citátama",
+  "Statistický widget s číselnými metrikami a sparkline grafy",
+  "Modal okno pro potvrzení akce s animací",
+  "Vyhledávací lišta s dropdown výsledky a našeptávačem",
+  "Notification toast s různými stavy (success, error, warning)",
+  "Profilová karta uživatele s avatarama, jménem a statistikama",
 ];
 
 const ROTATING_TEXTS = [
@@ -87,7 +98,7 @@ function LoadingState({ html }: { html: string }) {
       </div>
       <div className="text-center space-y-2">
         <p className="text-sm animate-pulse" style={{ color: 'var(--gold)' }}>
-          DeepSeek V4 Flash tvoří...
+          Přemýšlím...
         </p>
         <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
           {chars > 0 ? `${chars} znaků · ${lines} řádků` : 'Připravuji návrh...'}
@@ -135,6 +146,7 @@ export default function FlashUIForm() {
   const [prompt, setPrompt] = useState("");
   const [html, setHtml] = useState("");
   const [loading, setLoading] = useState(false);
+  const [randomizing, setRandomizing] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [showCode, setShowCode] = useState(false);
@@ -181,6 +193,31 @@ ${rawHtml}
       resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [hasResult]);
+
+  async function handleRandomPrompt() {
+    if (loading || randomizing) return;
+    setRandomizing(true);
+    try {
+      const res = await fetch("/api/flash-ui/random-prompt", {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to fetch random prompt");
+      const data = await res.json();
+      
+      // Ensure a minimum animation time for a smooth feel
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setPrompt(data.prompt);
+    } catch {
+      // Fallback to local samples if API fails
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const random = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
+      setPrompt(random);
+    } finally {
+      setRandomizing(false);
+    }
+    textareaRef.current?.focus();
+  }
 
   async function handleGenerate() {
     if (!prompt.trim() || loading) return;
@@ -275,20 +312,11 @@ ${rawHtml}
         <div className={`flex-1 flex flex-col items-center justify-center px-5 transition-all duration-700 ${hasResult ? 'pt-10 pb-6' : 'py-20'}`}>
           {!hasResult && (
             <div className="text-center mb-8 animate-fade-in-up">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(200, 150, 46, 0.2), rgba(200, 150, 46, 0.05))',
-                  border: '1px solid rgba(200, 150, 46, 0.3)',
-                  boxShadow: '0 0 40px rgba(200, 150, 46, 0.15)',
-                }}
-              >
-                <SparklesIcon size={28} className="text-gold" />
-              </div>
               <h2 className="headline-lg mb-3">
                 Flash <span style={{ color: 'var(--gold)' }}>UI</span>
               </h2>
               <p className="subhead mx-auto max-w-lg">
-                Generuj UI komponenty pomocí AI. Napiš prompt a sleduj, jak DeepSeek V4 Flash tvoří.
+                Navrhni UI komponentu. Napiš, co potřebuješ, a já to udělám.
               </p>
             </div>
           )}
@@ -325,27 +353,61 @@ ${rawHtml}
                   {loading && (
                     <button
                       onClick={handleStop}
-                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-all hover:bg-white/5"
                       style={{ color: "var(--text-muted)" }}
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
                       Zastavit
                     </button>
                   )}
+                  {hasResult && (
+                    <button
+                      onClick={handleReset}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-all hover:bg-white/5"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      <RefreshIcon size={12} />
+                      Nový
+                    </button>
+                  )}
                   <button
-                    onClick={() => void handleGenerate()}
-                    disabled={!prompt.trim() || loading}
-                    className="btn-apple btn-apple-primary inline-flex items-center gap-2"
+                    onClick={() => void handleRandomPrompt()}
+                    disabled={loading || randomizing}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-all"
+                    style={{
+                      color: randomizing ? "var(--text-muted)" : "var(--text-secondary)",
+                    }}
                   >
-                    {loading ? (
+                    {randomizing ? (
                       <>
-                        <RefreshIcon size={14} className="animate-spin-slow" />
-                        Generuju
+                        <RefreshIcon size={12} className="animate-spin-slow" />
+                        Hledám
                       </>
                     ) : (
                       <>
-                        <SparklesIcon size={14} />
-                        Generovat
+                        <RefreshIcon size={12} />
+                        Zkusit náhodně
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => void handleGenerate()}
+                    disabled={!prompt.trim() || loading}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all"
+                    style={{
+                      backgroundColor: prompt.trim() && !loading ? "rgba(200, 150, 46, 0.15)" : "var(--tag-bg)",
+                      color: prompt.trim() && !loading ? "var(--gold)" : "var(--text-muted)",
+                    }}
+                  >
+                    {loading ? (
+                      <>
+                        <RefreshIcon size={12} className="animate-spin-slow" />
+                        Navrhuju
+                      </>
+                    ) : (
+                      <>
+                        <SparklesIcon size={12} />
+                        Navrhnout
                       </>
                     )}
                   </button>
@@ -354,26 +416,10 @@ ${rawHtml}
             </div>
 
             {!hasResult && !loading && (
-              <div className="mt-6 animate-fade-in-up">
-                <p className="mb-3 text-xs uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>
-                  Nebo zkus:
+              <div className="mt-6 animate-fade-in-up text-center">
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Cmd/Ctrl + Enter pro rychlé odeslání
                 </p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {SAMPLE_PROMPTS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => { setPrompt(s); textareaRef.current?.focus(); }}
-                      className="rounded-full border px-4 py-2 text-xs transition-all hover:border-gold/50"
-                      style={{
-                        borderColor: "var(--tag-border)",
-                        backgroundColor: "var(--tag-bg)",
-                        color: "var(--tag-text)",
-                      }}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
               </div>
             )}
           </div>
@@ -403,25 +449,25 @@ ${rawHtml}
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-all hover:bg-white/5"
                   style={{ color: copied ? "var(--gold)" : "var(--text-muted)" }}
                 >
                   {copied ? <><CheckIcon size={12} /> Zkopírováno</> : <><ExternalLinkIcon size={12} /> Kopírovat</>}
                 </button>
                 <button
                   onClick={() => setShowCode(!showCode)}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-all hover:bg-white/5"
                   style={{ color: showCode ? "var(--gold)" : "var(--text-muted)" }}
                 >
                   {showCode ? "Skrýt kód" : "Zobrazit kód"}
                 </button>
                 <button
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all hover:bg-white/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-all hover:bg-white/5"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  <ArrowRightIcon size={12} className="rotate-[-135deg]" />
-                  Nový
+                  <RefreshIcon size={12} />
+                  Ještě jednou
                 </button>
               </div>
             </div>
@@ -440,7 +486,7 @@ ${rawHtml}
                 className="w-full border-0"
                 style={{ height: "500px", backgroundColor: "#0a0a0a" }}
                 title="Flash UI náhled"
-                sandbox="allow-scripts allow-same-origin"
+                sandbox="allow-scripts"
                 loading="lazy"
               />
             </div>
@@ -462,13 +508,6 @@ ${rawHtml}
               </div>
             )}
 
-            {/* Quick action */}
-            <div className="mt-6 flex justify-center">
-              <button onClick={handleReset} className="btn-apple btn-apple-secondary">
-                <SparklesIcon size={14} />
-                Generovat něco jiného
-              </button>
-            </div>
           </div>
         )}
 

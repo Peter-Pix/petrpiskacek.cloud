@@ -4,6 +4,21 @@ import { useState } from "react";
 import { SparklesIcon, ArrowRightIcon, RefreshIcon } from "./icons";
 import type { Block, BlockKind, BlockWithMeta, ClarifyQuestion } from "@/lib/sparring-types";
 
+const DAILY_LIMIT = 5;
+
+const RATE_LIMIT_MESSAGES = [
+  "Dneska už stačilo.",
+  "Zítra je taky den.",
+  "Šetři tokeny, člověče.",
+  "Brzdi! Nádech, výdech.",
+  "Klikáš to jak kliťák. Relax, tygře.",
+  "Nestačí? Petr ti spíchne lepší hračku.",
+  "Kámo, to není automat.",
+  "Nezvonil někdo? Běž otevřít.",
+  "Jindy, dneska už stačilo.",
+  "Nemáš nic lepšího na práci?",
+];
+
 type Phase = "input" | "clarify" | "blocks" | "done";
 
 const BLOCK_ORDER: BlockKind[] = ["core", "stack", "costs", "timeline"];
@@ -20,17 +35,50 @@ const SAMPLE_PROMPTS = [
   "Chatbot pro e-shop, co odpoví na dotazy o velikostech",
   "Interní nástroj na shrnutí meetingů, tým 30 lidí",
   "AI na analýzu smluv pro právní firmu",
+  "Služba pro automatickou transkripci lékařských zpráv",
+  "Systém pro generování personalizovaných pohádek pro děti",
+  "AI agent pro monitoring konkurence v e-commerce",
+  "Nástroj na automatickou analýzu sentimentu recenzí hotelů",
+  "AI průvodce pro začínající investory v kryptoměnách",
+  "Aplikace pro inteligentní plánování stravovacího režimu",
 ];
 
 export default function SparringForm() {
   const [phase, setPhase] = useState<Phase>("input");
   const [prompt, setPrompt] = useState("");
+  const [randomizing, setRandomizing] = useState(false);
   const [questions, setQuestions] = useState<ClarifyQuestion[]>([]);
+
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [blocks, setBlocks] = useState<Partial<Record<BlockKind, BlockWithMeta>>>({});
   const [currentBlockIdx, setCurrentBlockIdx] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [limitRemaining, setLimitRemaining] = useState(DAILY_LIMIT);
+
+  async function handleRandomPrompt() {
+    if (loading) return;
+    setRandomizing(true);
+    try {
+      const res = await fetch("/api/sparring/random-prompt", {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to fetch random prompt");
+      const data = await res.json();
+      
+      // Ensure a minimum animation time for a smooth feel
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setPrompt(data.prompt);
+    } catch {
+      // Fallback to local samples if API fails
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const randomSample = SAMPLE_PROMPTS[Math.floor(Math.random() * SAMPLE_PROMPTS.length)];
+      setPrompt(randomSample);
+    } finally {
+      setRandomizing(false);
+    }
+  }
 
   async function handleStart() {
     if (!prompt.trim() || loading) return;
@@ -42,6 +90,15 @@ export default function SparringForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim() }),
       });
+
+      const remaining = res.headers.get("X-RateLimit-Remaining");
+      if (remaining) setLimitRemaining(parseInt(remaining, 10));
+
+      if (res.status === 429) {
+        const msg = RATE_LIMIT_MESSAGES[Math.floor(Math.random() * RATE_LIMIT_MESSAGES.length)];
+        throw new Error(msg);
+      }
+
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Nepodařilo se spojit s AI");
@@ -62,20 +119,6 @@ export default function SparringForm() {
     }
   }
 
-  async function handleClarifySubmit() {
-    // Pokud jsou nějaké otázky nezodpovězené, vyplníme prázdné fallbacky
-    const finalAnswers: Record<string, string> = {};
-    for (const q of questions) {
-      finalAnswers[q.id] = answers[q.id]?.trim() || "(neuvedeno)";
-    }
-    setAnswers(finalAnswers);
-    setPhase("blocks");
-    setCurrentBlockIdx(0);
-    setBlocks({});
-    // Automaticky generujeme první blok
-    void generateBlock("core", finalAnswers);
-  }
-
   async function generateBlock(kind: BlockKind, finalAnswers: Record<string, string>) {
     setLoading(true);
     setError("");
@@ -94,12 +137,16 @@ export default function SparringForm() {
         throw new Error(data.error || "Nepodařilo se vygenerovat blok");
       }
       const data = await res.json();
+      if (!data.block) {
+        throw new Error(data.error || "API nevrátilo platný blok");
+      }
       setBlocks((prev) => ({
         ...prev,
         [kind]: { block: data.block, expanded: false },
       }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Něco se pokazilo");
+      setPhase("input");
     } finally {
       setLoading(false);
     }
@@ -149,6 +196,22 @@ export default function SparringForm() {
     }
   }
 
+  async function handleClarifySubmit() {
+    if (loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      setPhase("blocks");
+      setCurrentBlockIdx(0);
+      // První blok vygenerujeme hned
+      await generateBlock(BLOCK_ORDER[0], answers);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Něco se pokazilo");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleReset() {
     setPhase("input");
     setPrompt("");
@@ -156,6 +219,7 @@ export default function SparringForm() {
     setAnswers({});
     setBlocks({});
     setCurrentBlockIdx(0);
+    setLoading(false);
     setError("");
   }
 
@@ -172,19 +236,20 @@ export default function SparringForm() {
 
         {/* Fáze 0: Input */}
         {phase === "input" && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in mx-auto max-w-2xl">
             <div
-              className="mb-4 overflow-hidden rounded-2xl border"
+              className="mb-6 overflow-hidden rounded-2xl border"
               style={{ borderColor: "var(--border)" }}
             >
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Např. AI pro plánování závozů v logistické firmě..."
+                placeholder="Slovní popis tvého nápadu..."
                 rows={4}
-                className="w-full resize-none bg-transparent px-5 py-4 text-sm outline-none"
+                className="w-full resize-none bg-transparent px-5 py-4 text-sm outline-none text-center"
                 style={{
                   color: "var(--input-text)",
+                  opacity: 0.8,
                   caretColor: "var(--gold)",
                 }}
                 onKeyDown={(e) => {
@@ -197,59 +262,75 @@ export default function SparringForm() {
                 className="flex items-center justify-between border-t px-5 py-3"
                 style={{ borderColor: "var(--border)" }}
               >
-                <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-                  ⌘ + Enter pro start
-                </span>
+                {/* Rate limit indikátor */}
+                <div className="flex items-center gap-2 text-xs" style={{ color: limitRemaining <= 2 ? '#ef4444' : 'var(--text-muted)' }}>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: DAILY_LIMIT }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full transition-all"
+                        style={{
+                          backgroundColor: i < limitRemaining ? 'var(--gold)' : 'var(--border)',
+                          opacity: i < limitRemaining ? 1 : 0.3,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span>{limitRemaining}/{DAILY_LIMIT} dnes</span>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  onClick={() => void handleRandomPrompt()}
+                  disabled={loading}
+                  className="w-full sm:w-48 rounded-full border px-4 py-2 text-xs transition-all hover:bg-white/5 flex items-center justify-center gap-2"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--text-muted)",
+                    backgroundColor: "transparent",
+                    minHeight: "36px"
+                  }}
+                >
+                  <SparklesIcon size={14} />
+                  {randomizing ? "Přemýšlím..." : "Zkusit náhodně"}
+                </button>
+                
                 <button
                   onClick={() => void handleStart()}
                   disabled={!prompt.trim() || loading}
-                  className="btn-apple btn-apple-primary"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all"
+                  style={{
+                    backgroundColor: prompt.trim() && !loading ? "var(--gold)" : "var(--tag-bg)",
+                    color: prompt.trim() && !loading ? "var(--text-inverse)" : "var(--text-muted)",
+                  }}
                 >
                   {loading ? (
                     "Přemýšlím..."
                   ) : (
                     <>
-                      Začít
+                      Promyslet
                       <ArrowRightIcon size={16} />
                     </>
                   )}
                 </button>
               </div>
             </div>
-
-            {/* Sample prompty */}
-            <div className="mb-6">
-              <p
-                className="mb-2 text-xs uppercase tracking-wider"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Nebo zkus:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SAMPLE_PROMPTS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setPrompt(s)}
-                    className="rounded-full border px-3 py-1.5 text-xs transition-colors hover:border-gold"
-                    style={{
-                      borderColor: "var(--tag-border)",
-                      backgroundColor: "var(--tag-bg)",
-                      color: "var(--tag-text)",
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
             </div>
+
+            <p
+              className="text-center text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              ⌘ + Enter pro start
+            </p>
           </div>
         )}
 
         {/* Fáze 1: Clarify */}
         {phase === "clarify" && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in mx-auto max-w-2xl">
             <div
-              className="mb-6 rounded-2xl border p-5"
+              className="mb-8 rounded-2xl border p-5 text-center"
               style={{
                 borderColor: "var(--border)",
                 backgroundColor: "var(--bg-secondary)",
@@ -262,15 +343,15 @@ export default function SparringForm() {
             </div>
 
             <p
-              className="mb-4 text-sm"
+              className="mb-6 text-center text-sm"
               style={{ color: "var(--text-secondary)" }}
             >
               Než začnu, potřebuju vědět:
             </p>
 
-            <div className="mb-6 space-y-4">
+            <div className="mb-8 space-y-5">
               {questions.map((q) => (
-                <div key={q.id}>
+                <div key={q.id} className="text-center">
                   <label
                     htmlFor={q.id}
                     className="mb-2 block text-sm font-medium"
@@ -286,7 +367,7 @@ export default function SparringForm() {
                       setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
                     }
                     placeholder="Tvoje odpověď..."
-                    className="w-full rounded-xl border bg-transparent px-4 py-2.5 text-sm outline-none"
+                    className="mx-auto block w-full max-w-md rounded-xl border bg-transparent px-4 py-2.5 text-sm outline-none"
                     style={{
                       borderColor: "var(--input-border)",
                       color: "var(--input-text)",
@@ -305,17 +386,25 @@ export default function SparringForm() {
               ))}
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={handleReset}
-                className="btn-apple btn-apple-secondary"
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all"
+                style={{
+                  backgroundColor: "var(--tag-bg)",
+                  color: "var(--text-secondary)",
+                }}
               >
                 Zpět
               </button>
               <button
                 onClick={() => void handleClarifySubmit()}
                 disabled={loading}
-                className="btn-apple btn-apple-primary"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all"
+                style={{
+                  backgroundColor: loading ? "var(--tag-bg)" : "var(--gold)",
+                  color: loading ? "var(--text-muted)" : "var(--text-inverse)",
+                }}
               >
                 {loading ? "Přemýšlím..." : "Pokračovat"}
                 <ArrowRightIcon size={16} />
@@ -326,9 +415,9 @@ export default function SparringForm() {
 
         {/* Fáze 2: Blocks */}
         {phase === "blocks" && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in mx-auto max-w-2xl">
             {/* Progress */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-8 text-center">
               <p
                 className="text-xs uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
@@ -337,7 +426,7 @@ export default function SparringForm() {
               </p>
               <button
                 onClick={handleReset}
-                className="text-xs underline"
+                className="mt-2 text-xs underline"
                 style={{ color: "var(--text-muted)" }}
               >
                 Začít znovu
@@ -345,7 +434,7 @@ export default function SparringForm() {
             </div>
 
             {/* Generované bloky (všechny doposud) */}
-            <div className="space-y-4">
+            <div className="space-y-5">
               {BLOCK_ORDER.slice(0, currentBlockIdx + 1).map((kind, idx) => {
                 const block = blocks[kind];
                 if (!block) {
@@ -353,7 +442,7 @@ export default function SparringForm() {
                   return (
                     <div
                       key={kind}
-                      className="glass-card flex items-center gap-3 p-5"
+                      className="glass-card flex items-center justify-center gap-3 p-5"
                     >
                       <RefreshIcon size={16} className="animate-spin-slow" />
                       <span className="text-sm" style={{ color: "var(--text-muted)" }}>
@@ -379,11 +468,15 @@ export default function SparringForm() {
             {/* Next button */}
             {currentBlockIdx < BLOCK_ORDER.length - 1 &&
               blocks[BLOCK_ORDER[currentBlockIdx]] && (
-                <div className="mt-6 flex justify-end">
+                <div className="mt-8 flex justify-center">
                   <button
                     onClick={() => void handleNextBlock()}
                     disabled={loading}
-                    className="btn-apple btn-apple-primary"
+                    className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all"
+                    style={{
+                      backgroundColor: loading ? "var(--tag-bg)" : "var(--gold)",
+                      color: loading ? "var(--text-muted)" : "var(--text-inverse)",
+                    }}
                   >
                     Další blok
                     <ArrowRightIcon size={16} />
@@ -395,8 +488,8 @@ export default function SparringForm() {
 
         {/* Fáze 3: Done */}
         {phase === "done" && (
-          <div className="animate-fade-in">
-            <div className="space-y-4">
+          <div className="animate-fade-in mx-auto max-w-2xl">
+            <div className="space-y-5">
               {BLOCK_ORDER.map((kind) => {
                 const block = blocks[kind];
                 if (!block) return null;
@@ -414,7 +507,7 @@ export default function SparringForm() {
               })}
             </div>
 
-            <div className="mt-8 flex flex-col items-center gap-3 text-center">
+            <div className="mt-10 flex flex-col items-center gap-3 text-center">
               <p
                 className="text-xs"
                 style={{ color: "var(--text-muted)" }}
@@ -423,7 +516,11 @@ export default function SparringForm() {
               </p>
               <button
                 onClick={handleReset}
-                className="btn-apple btn-apple-secondary"
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all"
+                style={{
+                  backgroundColor: "var(--tag-bg)",
+                  color: "var(--text-secondary)",
+                }}
               >
                 <RefreshIcon size={14} />
                 Začít znovu s jiným zadáním
@@ -472,7 +569,7 @@ function BlockCard({
         transition: "border-color 0.5s ease",
       }}
     >
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-center relative">
         <h3
           className="text-xs font-semibold uppercase tracking-wider"
           style={{ color: "var(--gold)" }}
@@ -482,7 +579,7 @@ function BlockCard({
         <button
           onClick={onExpand}
           disabled={expanding}
-          className="text-xs transition-opacity disabled:opacity-30"
+          className="absolute right-0 text-xs transition-opacity disabled:opacity-30"
           style={{ color: "var(--text-muted)" }}
         >
           {expanding ? "Přemýšlím..." : "↻ Rozveď"}
@@ -567,7 +664,7 @@ function BlockContent({ block }: { block: Block }) {
         {items.map((item) => (
           <div
             key={item.label}
-            className="rounded-lg p-2.5"
+            className="rounded-lg p-2.5 text-center"
             style={{
               backgroundColor: "var(--bg-primary)",
               border: "1px solid var(--border)",
@@ -609,9 +706,9 @@ function BlockContent({ block }: { block: Block }) {
   if (block.kind === "timeline") {
     return (
       <div className="space-y-3">
-        <TimelineRow label="Fáze 1 (1-2 týdny)" value={block.phase1} />
-        <TimelineRow label="Fáze 2 (2-4 týdny)" value={block.phase2} />
-        <TimelineRow label="Fáze 3 (1+ měsíc)" value={block.phase3} />
+        <TimelineRow label="Fáze 1 (1-2 týdny)" value={block.prvniFaze} />
+        <TimelineRow label="Fáze 2 (2-4 týdny)" value={block.druhaFaze} />
+        <TimelineRow label="Fáze 3 (1+ měsíc)" value={block.tretiFaze} />
       </div>
     );
   }
