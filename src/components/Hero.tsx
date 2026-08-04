@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 // Rotující výroky — typewriter efekt jako na ostatních stránkách
 const ROTATING_QUOTES = [
-  "Svět rovnováhy.",
-  "Nad očekávání.",
-  "Prostě funguje.",
+  "Sny jsou kód.",
+  "Minimalismus.",
+  "Vyšší úroveň.",
+  "To podstatné.",
 ];
 
 export default function Hero() {

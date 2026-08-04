@@ -1,12 +1,12 @@
 import { Metadata } from "next";
 import Nav from "@/components/Nav";
 import SparringForm from "@/components/SparringForm";
-import Footer from "@/components/Footer";
+import { Footer } from "@piskacek/ui";
 
 export const metadata: Metadata = {
-  title: "Challenge AI — petrpiskacek.cloud",
+  title: "Promysli to lépe — Rychlý návrh projektu",
   description:
-    "Zadej mi projektový prompt a já ti ukážu, jak bych na to šel. Architektura, stack, náklady, roadmapa.",
+    "Zadejte projekt. Ukážu, jak na to. Expertíza, náklady, plán. Vše, co potřebujete vědět.",
 };
 
 export default function ChallengePage() {

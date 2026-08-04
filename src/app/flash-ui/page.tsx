@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Nav from "@/components/Nav";
 import FlashUIForm from "@/components/FlashUIForm";
-import Footer from "@/components/Footer";
+import { Footer } from "@piskacek/ui";
 
 export const metadata: Metadata = {
   title: "Flash UI — petrpiskacek.cloud",

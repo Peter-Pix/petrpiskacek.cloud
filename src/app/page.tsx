@@ -2,7 +2,7 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import AppGrid from "@/components/AppGrid";
 import LiveStatus from "@/components/LiveStatus";
-import Footer from "@/components/Footer";
+import { Footer } from "@piskacek/ui";
 
 export default function Home() {
   return (
