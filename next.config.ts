@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: __dirname,
-  },
+  serverExternalPackages: ["@piskacek/ui"],
 };
 
 export default nextConfig;

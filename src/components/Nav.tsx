@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { MenuIcon, CloseIcon } from "./icons";
-import SiteSwitcher from "./SiteSwitcher";
+import { SiteSwitcher } from "@piskacek/ui";
 
 const links = [
   { href: "/", label: "Domů" },
