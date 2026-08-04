@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.2.12",
-    "@piskacek/ui": "link:/Users/petrpiskacek/projects/ecosystem-dashboard/packages/ui",
     "@swc/helpers": "^0.5.23",
     "isomorphic-dompurify": "^3.21.0",
     "next": "16.2.10",
