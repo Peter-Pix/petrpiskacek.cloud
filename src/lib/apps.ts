@@ -26,18 +26,6 @@ export const apps: App[] = [
     category: "ai",
   },
   {
-    id: "dashboard",
-    name: "Dashboard",
-    emoji: "",
-    tagline: "Live monitoring AI infrastruktury",
-    description:
-      "Streamlit dashboard se realtime metrikami všech běžících AI služeb. Latence, vytížení, stav modelů. Postavený na Python + Streamlit, data z API endpointů.",
-    status: "online",
-    href: "https://dashboard.petrpiskacek.cloud",
-    external: true,
-    category: "tool",
-  },
-  {
     id: "sparring",
     name: "Sparring",
     emoji: "",
@@ -72,18 +60,6 @@ export const apps: App[] = [
     href: "https://4rap.cz",
     external: true,
     category: "data",
-  },
-  {
-    id: "scrollo",
-    name: "Scrollo",
-    emoji: "",
-    tagline: "Užitečný nástroje bez reklam",
-    description:
-      "Kolekce client-side nástrojů — převodníky, generátory, analyzátory. Všechno běží v prohlížeči, žádný data se neukládají na server. PWA, offline-ready, zero tracking.",
-    status: "online",
-    href: "https://scrollo.cz",
-    external: true,
-    category: "tool",
   },
   {
     id: "docbot",

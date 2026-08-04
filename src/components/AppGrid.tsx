@@ -16,10 +16,6 @@ const STORIES: Record<string, { hook: string; body: string }> = {
     hook: "Přijde e-mail, Karel se stará.",
     body: "Rozpozná, co je důležitý. Roztřídí, co není. Odpoví, když ty nemůžeš. Sekretář bez výmluv.",
   },
-  dashboard: {
-    hook: "Pořád se něco děje.",
-    body: "Latence, vytížení, stav modelů — všechno na jednom místě v reálným čase. Víš, kdy něco p",
-  },
   sparring: {
     hook: "Víc hlav víc ví.",
     body: "Napíšeš nápad. AI se doptá. Pak dostaneš stack, cenu a plán. Ne vágní rady — konkrétní čtyři bloky, který jdou rovnou do akce.",
@@ -31,10 +27,6 @@ const STORIES: Record<string, { hook: string; body: string }> = {
   "4rap": {
     hook: "Za hranicí hudby.",
     body: "1699 jmen. 9281 vazeb. Kdo s kým, kdo kde, co kdy vyšlo. Největší mapa českýho rapu — a pořád roste.",
-  },
-  scrollo: {
-    hook: "Rychlý, chytrý, levný.",
-    body: "Nástroje, který prostě fungujou. V prohlížeči, offline, bez reklam. Nic víc. Nic míň.",
   },
   docbot: {
     hook: "Šikovný úředník.",
