@@ -44,8 +44,8 @@ export default function AppGrid() {
       <div className="container-apple">
         {/* Jedna appka na řádek — na mobilu i desktopu. Velké rozestupy. */}
         <div className="space-y-40 md:space-y-64">
-          {apps.map((app, idx) => (
-            <AppRow key={app.id} app={app} index={idx} />
+          {apps.map((app) => (
+            <AppRow key={app.id} app={app} />
           ))}
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function AppGrid() {
   );
 }
 
-function AppRow({ app, index }: { app: App; index: number }) {
+function AppRow({ app }: { app: App }) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -77,8 +77,6 @@ function AppRow({ app, index }: { app: App; index: number }) {
   const status = statusLabels[app.status];
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
   const hasShot = app.href && app.href !== "#";
-  // Střídavé zarovnání na desktopu — text vlevo / vpravo, ať to má rytmus.
-  const reverse = index % 2 === 1;
 
   return (
     <article
@@ -89,29 +87,26 @@ function AppRow({ app, index }: { app: App; index: number }) {
           : "translate-y-8 opacity-0"
       }`}
     >
-      <div
-        className={`flex flex-col gap-8 md:flex-row md:items-center md:gap-16 ${
-          reverse ? "md:flex-row-reverse" : ""
-        }`}
-      >
-        {/* Screenshot — nahoře na mobilu, střídavě vlevo/vpravo na desktopu */}
-        {hasShot && (
-          <div className="md:w-[58%] shrink-0">
-            <div className="card-hover overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)]">
-              <img
-                src={`/screenshots/${app.id}.jpg`}
-                alt={`Screenshot aplikace ${app.name}`}
-                loading="lazy"
-                className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
-              />
-            </div>
+      {/* Screenshot — full width nahoře, na mobilu i desktopu */}
+      {hasShot && (
+        <div className="mb-6 md:mb-10">
+          <div className="card-hover overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)]">
+            <img
+              src={`/screenshots/${app.id}.jpg`}
+              alt={`Screenshot aplikace ${app.name}`}
+              loading="lazy"
+              className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+            />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Text */}
-        <div className="flex flex-1 flex-col gap-3 md:max-w-sm">
+      {/* Název + popis — na desktopu vedle sebe (název vlevo, popis vpravo) */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-16">
+        {/* Velký název + hák */}
+        <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-semibold md:text-2xl">{app.name}</h3>
+            <h3 className="text-2xl font-semibold md:text-4xl">{app.name}</h3>
             <span
               className="inline-flex shrink-0 items-center gap-1.5 text-xs"
               style={{ color: status.color }}
@@ -125,12 +120,15 @@ function AppRow({ app, index }: { app: App; index: number }) {
           </div>
 
           <p
-            className="text-2xl font-light leading-tight tracking-tight md:text-3xl"
+            className="mt-3 text-3xl font-light leading-tight tracking-tight md:text-5xl"
             style={{ color: "var(--text-primary)" }}
           >
             {story.hook}
           </p>
+        </div>
 
+        {/* Jednoduchý popis + CTA */}
+        <div className="flex flex-col gap-5 md:w-[380px] md:shrink-0 md:pt-2">
           <p
             className="text-sm leading-relaxed md:text-base"
             style={{ color: "var(--text-secondary)" }}
@@ -139,7 +137,7 @@ function AppRow({ app, index }: { app: App; index: number }) {
           </p>
 
           {hasShot && (
-            <div className="pt-2">
+            <div>
               <AppLink
                 href={app.href}
                 external={app.external}
