@@ -19,7 +19,7 @@ export const apps: App[] = [
     emoji: "",
     tagline: "AI e-mailovej administrátor",
     description:
-      "Pošli mu e-mail a on ho analyzuje, roztřídí a napíše odpověď. Umí rozpoznat urgentní zprávy, faktury, newslettery a osobní poštu. Běží na Ollama cloudu, frontend ve Vite + React.",
+      "Rozpozná to důležité. Postará se o vše, co není. Odpoví na jednoduché rutinní věci. Práce bez výmluv.",
     status: "online",
     href: "https://karel.petrpiskacek.cloud",
     external: true,
@@ -31,7 +31,7 @@ export const apps: App[] = [
     emoji: "",
     tagline: "AI konzultant na projekty",
     description:
-      "Napíšeš nápad, AI se doptá na detaily, pak ti nacení, navrhne technologickej stack a časovej plán. 4 bloky: jádro, stack, náklady, postup. Každej blok jde rozvést.",
+      "Stačí nápad a klik. Návrh aplikace se vytvoří během pár vteřin.",
     status: "online",
     href: "/challenge",
     external: false,
@@ -43,7 +43,7 @@ export const apps: App[] = [
     emoji: "",
     tagline: "Generuj UI komponenty z promptu",
     description:
-      "Napiš, co chceš za UI komponentu, a DeepSeek V4 Flash ji nakreslí v reálném čase. Tlačítka, formuláře, karty, dashboardy — cokoliv. Postavený na Next.js API route + OpenRouter.",
+      "Design pro váš web. Přidejte nový formulář, chat, ceník. Cokoliv jen chcete.",
     status: "beta",
     href: "/flash-ui",
     external: false,
@@ -55,7 +55,7 @@ export const apps: App[] = [
     emoji: "",
     tagline: "Znalostní databáze českýho rapu",
     description:
-      "1699 entit, 9281 vazeb. Interaktivní D3 graf, full-text search, Schema.org SEO. Každej interpret, album, label a jejich propojení. Next.js + MDX, buildí 1200+ stránek.",
+      "Vědomostní graf české rapové scény. Chaos dostal řád. Přesvěčte se sami.",
     status: "online",
     href: "https://4rap.cz",
     external: true,
@@ -67,7 +67,7 @@ export const apps: App[] = [
     emoji: "",
     tagline: "AI právník na český smlouvy",
     description:
-      "Postaví ti NDA, nájemní nebo pracovní smlouvu podle českého práva. Chatem tě provede krok za krokem, pak smlouvu zkontroluje na právní rizika. DeepSeek V4 Flash backend, Vite + React frontend.",
+      "Žádné ruční vyplňování. Smlouvy snadno a rychle. Dělejte to jednoduše.",
     status: "beta",
     href: "https://docbot.petrpiskacek.cloud",
     external: true,
@@ -79,7 +79,7 @@ export const apps: App[] = [
     emoji: "",
     tagline: "Trénink příkazovýho řádku",
     description:
-      "Uč se Linux, macOS a Windows příkazy v bezpečným virtuálním terminálu. Přepínej mezi OS, dělej chyby a AI učitel ti je vysvětlí. Virtuální filesystem, lekce, progress tracking. Běží na Ollama cloudu.",
+      "Naučte se terminál jinak. Učitel opravuje chyby a napovídá. Lekce s příběhem.",
     status: "online",
     href: "https://terminall.petrpiskacek.cloud",
     external: true,
