@@ -44,8 +44,8 @@ export default function AppGrid() {
       <div className="container-apple">
         {/* Jedna appka na řádek — na mobilu i desktopu. Velké rozestupy. */}
         <div className="space-y-40 md:space-y-64">
-          {apps.map((app, idx) => (
-            <AppRow key={app.id} app={app} index={idx} />
+          {apps.map((app) => (
+            <AppRow key={app.id} app={app} />
           ))}
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function AppGrid() {
   );
 }
 
-function AppRow({ app, index }: { app: App; index: number }) {
+function AppRow({ app }: { app: App }) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -77,8 +77,6 @@ function AppRow({ app, index }: { app: App; index: number }) {
   const status = statusLabels[app.status];
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
   const hasShot = app.href && app.href !== "#";
-  // Zigzag — textový blok se střídá vlevo / vpravo.
-  const alignRight = index % 2 === 1;
 
   return (
     <article
@@ -103,12 +101,8 @@ function AppRow({ app, index }: { app: App; index: number }) {
         </div>
       )}
 
-      {/* Velký název + hák — střídavě vlevo / vpravo (zigzag) */}
-      <div
-        className={`flex flex-col ${
-          alignRight ? "md:items-end md:text-right" : "md:items-start"
-        }`}
-      >
+      {/* Velký název + hák — vlevo */}
+      <div className="flex flex-col items-start">
         <div className="flex items-center gap-3">
           <h3 className="text-3xl font-semibold md:text-5xl">{app.name}</h3>
           <span
@@ -124,17 +118,15 @@ function AppRow({ app, index }: { app: App; index: number }) {
         </div>
 
         <p
-          className={`mt-3 text-3xl font-light leading-tight tracking-tight md:text-5xl ${
-            alignRight ? "md:text-right" : ""
-          }`}
+          className="mt-3 text-3xl font-light leading-tight tracking-tight md:text-5xl"
           style={{ color: "var(--text-primary)" }}
         >
           {story.hook}
         </p>
       </div>
 
-      {/* Popis + CTA — pod nápisem, výraznější, střídavě zarovnaný */}
-      <div className={`mt-5 max-w-xl ${alignRight ? "md:ml-auto md:text-right" : ""}`}>
+      {/* Popis + CTA — pod nápisem, vlevo, max 800px (1000px na velkých) */}
+      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px]">
         <p
           className="text-base font-medium leading-relaxed md:text-lg"
           style={{ color: "var(--text-secondary)" }}
@@ -143,7 +135,7 @@ function AppRow({ app, index }: { app: App; index: number }) {
         </p>
 
         {hasShot && (
-          <div className={`mt-5 ${alignRight ? "md:flex md:justify-end" : ""}`}>
+          <div className="mt-5">
             <AppLink
               href={app.href}
               external={app.external}
