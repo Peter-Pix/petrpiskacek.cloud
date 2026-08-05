@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { trackEvent } from "@/lib/track";
 
 /**
  * ClosingCTA — závěrečný konverzní blok před footerem.
@@ -30,10 +33,22 @@ export default function ClosingCTA() {
             </p>
 
             <div className="flex flex-col items-center justify-center gap-3 pt-4 sm:flex-row">
-              <Link href="/challenge" className="btn-apple btn-apple-primary">
+              <Link
+                href="/challenge"
+                className="btn-apple btn-apple-primary"
+                onClick={() =>
+                  trackEvent("click_cta", { cta: "sparring", location: "closing" })
+                }
+              >
                 Otestuj AI konzultanta →
               </Link>
-              <a href="#apps" className="btn-apple btn-apple-secondary">
+              <a
+                href="#apps"
+                className="btn-apple btn-apple-secondary"
+                onClick={() =>
+                  trackEvent("click_cta", { cta: "apps", location: "closing" })
+                }
+              >
                 Prohlédnout aplikace
               </a>
             </div>

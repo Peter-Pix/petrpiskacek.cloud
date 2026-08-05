@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { apps, type App } from "@/lib/apps";
+import { trackEvent } from "@/lib/track";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   online: { label: "Běží", color: "var(--status-online)" },
@@ -142,6 +143,8 @@ function AppRow({ app }: { app: App }) {
               href={app.href}
               external={app.external}
               label={buttonLabel}
+              appId={app.id}
+              appName={app.name}
             />
           </div>
         )}
@@ -159,10 +162,14 @@ function AppLink({
   href,
   external,
   label,
+  appId,
+  appName,
 }: {
   href: string;
   external: boolean;
   label: string;
+  appId: string;
+  appName: string;
 }) {
   const className =
     "group inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all";
@@ -184,6 +191,7 @@ function AppLink({
         rel="noopener noreferrer"
         className={className}
         style={style}
+        onClick={() => trackEvent("click_app", { app: appId, name: appName })}
       >
         <span>{label}</span>
         {arrow}
@@ -192,7 +200,12 @@ function AppLink({
   }
 
   return (
-    <Link href={href} className={className} style={style}>
+    <Link
+      href={href}
+      className={className}
+      style={style}
+      onClick={() => trackEvent("click_app", { app: appId, name: appName })}
+    >
       <span>{label}</span>
       {arrow}
     </Link>
