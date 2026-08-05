@@ -14,27 +14,27 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 const STORIES: Record<string, { hook: string; body: string }> = {
   karel: {
     hook: "Přijde e-mail, Karel se stará.",
-    body: "Rozpozná, co je důležitý. Roztřídí, co není. Odpoví, když ty nemůžeš. Sekretář bez výmluv.",
+    body: "Rozpozná to důležité. Postará se o vše, co není. Odpoví na jednoduché rutinní věci. Práce bez výmluv.",
   },
   sparring: {
     hook: "Víc hlav víc ví.",
-    body: "Napíšeš nápad. AI se doptá. Pak dostaneš stack, cenu a plán. Ne vágní rady — konkrétní čtyři bloky, který jdou rovnou do akce.",
+    body: "Stačí nápad a klik. Návrh aplikace se vytvoří během pár vteřin.",
   },
   "flash-ui": {
     hook: "Design na dotek.",
-    body: "Napiš, co chceš. Uvidíš to za sekundu. Žádný šablony, žádný copy-paste — každej návrh vzniká live, pro tebe.",
+    body: "Design pro váš web. Přidejte nový formulář, chat, ceník. Cokoliv jen chcete.",
   },
   "4rap": {
     hook: "Za hranicí hudby.",
-    body: "1699 jmen. 9281 vazeb. Kdo s kým, kdo kde, co kdy vyšlo. Největší mapa českýho rapu — a pořád roste.",
+    body: "Vědomostní graf české rapové scény. Chaos dostal řád. Přesvědčte se sami.",
   },
   docbot: {
     hook: "Šikovný úředník.",
-    body: "NDA, nájemka, pracovní smlouva — chat tě provede, výsledek zkontroluje na rizika. Hotovo dřív, než bys našel právníka.",
+    body: "Žádné ruční vyplňování. Smlouvy snadno a rychle. Dělejte to jednoduše.",
   },
   terminall: {
     hook: "Vítej v Matrixu.",
-    body: "Bezpečný terminál, kde se smí chybovat. AI ti každou chybu vysvětlí. Od ls po docker — na Linuxu, Macu i Windows.",
+    body: "Naučte se terminál jinak. Učitel opravuje chyby a napovídá. Lekce s příběhem.",
   },
 };
 
