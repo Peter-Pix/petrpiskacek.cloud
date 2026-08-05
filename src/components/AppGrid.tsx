@@ -41,10 +41,10 @@ export default function AppGrid() {
   return (
     <section id="apps" className="section-apple">
       <div className="container-apple">
-        {/* Jedna appka na řádek — na mobilu i desktopu. Prostor a klid. */}
-        <div className="space-y-20 md:space-y-32">
-          {apps.map((app) => (
-            <AppRow key={app.id} app={app} />
+        {/* Jedna appka na řádek — na mobilu i desktopu. Velké rozestupy. */}
+        <div className="space-y-24 md:space-y-40">
+          {apps.map((app, idx) => (
+            <AppRow key={app.id} app={app} index={idx} />
           ))}
         </div>
       </div>
@@ -52,16 +52,22 @@ export default function AppGrid() {
   );
 }
 
-function AppRow({ app }: { app: App }) {
+function AppRow({ app, index }: { app: App; index: number }) {
   const story = STORIES[app.id] || { hook: app.tagline, body: app.description };
   const status = statusLabels[app.status];
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
   const hasShot = app.href && app.href !== "#";
+  // Střídavé zarovnání na desktopu — text vlevo / vpravo, ať to má rytmus.
+  const reverse = index % 2 === 1;
 
   return (
     <article className="group">
-      <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
-        {/* Screenshot — nahoře na mobilu, vlevo na desktopu */}
+      <div
+        className={`flex flex-col gap-8 md:flex-row md:items-center md:gap-16 ${
+          reverse ? "md:flex-row-reverse" : ""
+        }`}
+      >
+        {/* Screenshot — nahoře na mobilu, střídavě vlevo/vpravo na desktopu */}
         {hasShot && (
           <div className="md:w-[58%] shrink-0">
             <div className="card-hover overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)]">
