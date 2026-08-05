@@ -42,7 +42,7 @@ export default function AppGrid() {
     <section id="apps" className="section-apple">
       <div className="container-apple">
         {/* Jedna appka na řádek — na mobilu i desktopu. Prostor a klid. */}
-        <div className="space-y-16 md:space-y-24">
+        <div className="space-y-20 md:space-y-32">
           {apps.map((app) => (
             <AppRow key={app.id} app={app} />
           ))}
