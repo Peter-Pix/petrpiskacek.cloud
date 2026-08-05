@@ -44,8 +44,8 @@ export default function AppGrid() {
       <div className="container-apple">
         {/* Jedna appka na řádek — na mobilu i desktopu. Velké rozestupy. */}
         <div className="space-y-40 md:space-y-64">
-          {apps.map((app) => (
-            <AppRow key={app.id} app={app} />
+          {apps.map((app, idx) => (
+            <AppRow key={app.id} app={app} index={idx} />
           ))}
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function AppGrid() {
   );
 }
 
-function AppRow({ app }: { app: App }) {
+function AppRow({ app, index }: { app: App; index: number }) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -77,6 +77,8 @@ function AppRow({ app }: { app: App }) {
   const status = statusLabels[app.status];
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
   const hasShot = app.href && app.href !== "#";
+  // Zigzag — textový blok se střídá vlevo / vpravo.
+  const alignRight = index % 2 === 1;
 
   return (
     <article
@@ -101,51 +103,54 @@ function AppRow({ app }: { app: App }) {
         </div>
       )}
 
-      {/* Název + popis — na desktopu vedle sebe (název vlevo, popis vpravo) */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-16">
-        {/* Velký název + hák */}
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h3 className="text-2xl font-semibold md:text-4xl">{app.name}</h3>
+      {/* Velký název + hák — střídavě vlevo / vpravo (zigzag) */}
+      <div
+        className={`flex flex-col ${
+          alignRight ? "md:items-end md:text-right" : "md:items-start"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <h3 className="text-3xl font-semibold md:text-5xl">{app.name}</h3>
+          <span
+            className="inline-flex shrink-0 items-center gap-1.5 text-xs"
+            style={{ color: status.color }}
+          >
             <span
-              className="inline-flex shrink-0 items-center gap-1.5 text-xs"
-              style={{ color: status.color }}
-            >
-              <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: status.color }}
-              />
-              {status.label}
-            </span>
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: status.color }}
+            />
+            {status.label}
+          </span>
+        </div>
+
+        <p
+          className={`mt-3 text-3xl font-light leading-tight tracking-tight md:text-5xl ${
+            alignRight ? "md:text-right" : ""
+          }`}
+          style={{ color: "var(--text-primary)" }}
+        >
+          {story.hook}
+        </p>
+      </div>
+
+      {/* Popis + CTA — pod nápisem, výraznější, střídavě zarovnaný */}
+      <div className={`mt-5 max-w-xl ${alignRight ? "md:ml-auto md:text-right" : ""}`}>
+        <p
+          className="text-base font-medium leading-relaxed md:text-lg"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          {story.body}
+        </p>
+
+        {hasShot && (
+          <div className={`mt-5 ${alignRight ? "md:flex md:justify-end" : ""}`}>
+            <AppLink
+              href={app.href}
+              external={app.external}
+              label={buttonLabel}
+            />
           </div>
-
-          <p
-            className="mt-3 text-3xl font-light leading-tight tracking-tight md:text-5xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {story.hook}
-          </p>
-        </div>
-
-        {/* Jednoduchý popis + CTA */}
-        <div className="flex flex-col gap-5 md:w-[380px] md:shrink-0 md:pt-2">
-          <p
-            className="text-sm leading-relaxed md:text-base"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {story.body}
-          </p>
-
-          {hasShot && (
-            <div>
-              <AppLink
-                href={app.href}
-                external={app.external}
-                label={buttonLabel}
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </article>
   );
