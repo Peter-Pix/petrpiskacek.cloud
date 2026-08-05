@@ -37,16 +37,14 @@ const STORIES: Record<string, { hook: string; body: string }> = {
   },
 };
 
-/** Aplikace, které v Bento gridu zabírají 2 sloupce (featured). */
-const FEATURED = new Set(["karel", "4rap"]);
-
 export default function AppGrid() {
   return (
     <section id="apps" className="section-apple">
       <div className="container-apple">
-        <div className="bento-grid">
-          {apps.map((app, idx) => (
-            <AppCard key={app.id} app={app} featured={FEATURED.has(app.id)} />
+        {/* Jedna appka na řádek — na mobilu i desktopu. Prostor a klid. */}
+        <div className="space-y-16 md:space-y-24">
+          {apps.map((app) => (
+            <AppRow key={app.id} app={app} />
           ))}
         </div>
       </div>
@@ -54,73 +52,69 @@ export default function AppGrid() {
   );
 }
 
-function AppCard({
-  app,
-  featured,
-}: {
-  app: App;
-  featured: boolean;
-}) {
+function AppRow({ app }: { app: App }) {
   const story = STORIES[app.id] || { hook: app.tagline, body: app.description };
   const status = statusLabels[app.status];
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
   const hasShot = app.href && app.href !== "#";
 
   return (
-    <article
-      className={`group bento-item card-hover flex flex-col overflow-hidden ${
-        featured ? "bento-item-large" : ""
-      }`}
-    >
-      {/* Screenshot — nahoře na mobilu, dlaždice na desktopu */}
-      <div className="mb-5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-        <img
-          src={`/screenshots/${app.id}.jpg`}
-          alt={`Screenshot aplikace ${app.name}`}
-          loading="lazy"
-          className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
-
-      {/* Text */}
-      <div className="flex flex-1 flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-lg font-semibold md:text-xl">{app.name}</h3>
-          <span
-            className="inline-flex shrink-0 items-center gap-1.5 text-xs"
-            style={{ color: status.color }}
-          >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: status.color }}
-            />
-            {status.label}
-          </span>
-        </div>
-
-        <p
-          className="text-xl font-light leading-tight tracking-tight md:text-2xl"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {story.hook}
-        </p>
-
-        <p
-          className="text-sm leading-relaxed md:text-base"
-          style={{ color: "var(--text-secondary)" }}
-        >
-          {story.body}
-        </p>
-
+    <article className="group">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
+        {/* Screenshot — nahoře na mobilu, vlevo na desktopu */}
         {hasShot && (
-          <div className="mt-auto pt-4">
-            <AppLink
-              href={app.href}
-              external={app.external}
-              label={buttonLabel}
-            />
+          <div className="md:w-[58%] shrink-0">
+            <div className="card-hover overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)]">
+              <img
+                src={`/screenshots/${app.id}.jpg`}
+                alt={`Screenshot aplikace ${app.name}`}
+                loading="lazy"
+                className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+            </div>
           </div>
         )}
+
+        {/* Text */}
+        <div className="flex flex-1 flex-col gap-3 md:max-w-sm">
+          <div className="flex items-center gap-3">
+            <h3 className="text-xl font-semibold md:text-2xl">{app.name}</h3>
+            <span
+              className="inline-flex shrink-0 items-center gap-1.5 text-xs"
+              style={{ color: status.color }}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: status.color }}
+              />
+              {status.label}
+            </span>
+          </div>
+
+          <p
+            className="text-2xl font-light leading-tight tracking-tight md:text-3xl"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {story.hook}
+          </p>
+
+          <p
+            className="text-sm leading-relaxed md:text-base"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            {story.body}
+          </p>
+
+          {hasShot && (
+            <div className="pt-2">
+              <AppLink
+                href={app.href}
+                external={app.external}
+                label={buttonLabel}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </article>
   );
