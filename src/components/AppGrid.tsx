@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { apps, type App } from "@/lib/apps";
 
@@ -38,13 +37,16 @@ const STORIES: Record<string, { hook: string; body: string }> = {
   },
 };
 
+/** Aplikace, které v Bento gridu zabírají 2 sloupce (featured). */
+const FEATURED = new Set(["karel", "4rap"]);
+
 export default function AppGrid() {
   return (
     <section id="apps" className="section-apple">
       <div className="container-apple">
-        <div className="space-y-24">
+        <div className="bento-grid">
           {apps.map((app, idx) => (
-            <AppFeature key={app.id} app={app} index={idx} />
+            <AppCard key={app.id} app={app} featured={FEATURED.has(app.id)} />
           ))}
         </div>
       </div>
@@ -52,88 +54,75 @@ export default function AppGrid() {
   );
 }
 
-function AppFeature({ app, index }: { app: App; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+function AppCard({
+  app,
+  featured,
+}: {
+  app: App;
+  featured: boolean;
+}) {
   const story = STORIES[app.id] || { hook: app.tagline, body: app.description };
   const status = statusLabels[app.status];
-  const isEven = index % 2 === 0;
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
+  const hasShot = app.href && app.href !== "#";
 
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+    <article
+      className={`group bento-item card-hover flex flex-col overflow-hidden ${
+        featured ? "bento-item-large" : ""
       }`}
     >
-      <div
-        className={`flex flex-col gap-8 md:gap-12 ${
-          isEven ? "md:flex-row" : "md:flex-row-reverse"
-        }`}
-      >
-        <div className="flex-1 space-y-4 md:space-y-6">
-          <div className="flex items-center gap-3">
-            <div>
-              <h3 className="text-lg font-semibold md:text-xl">{app.name}</h3>
-              <span
-                className="inline-flex items-center gap-1.5 text-xs"
-                style={{ color: status.color }}
-              >
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: status.color }}
-                />
-                {status.label}
-              </span>
-            </div>
-          </div>
+      {/* Screenshot — nahoře na mobilu, dlaždice na desktopu */}
+      <div className="mb-5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+        <img
+          src={`/screenshots/${app.id}.jpg`}
+          alt={`Screenshot aplikace ${app.name}`}
+          loading="lazy"
+          className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
 
-          <p
-            className="text-2xl font-light leading-tight tracking-tight md:text-3xl lg:text-4xl"
-            style={{ color: "var(--text-primary)" }}
+      {/* Text */}
+      <div className="flex flex-1 flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold md:text-xl">{app.name}</h3>
+          <span
+            className="inline-flex shrink-0 items-center gap-1.5 text-xs"
+            style={{ color: status.color }}
           >
-            {story.hook}
-          </p>
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: status.color }}
+            />
+            {status.label}
+          </span>
+        </div>
 
-          <p
-            className="text-sm leading-relaxed md:text-base"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {story.body}
-          </p>
+        <p
+          className="text-xl font-light leading-tight tracking-tight md:text-2xl"
+          style={{ color: "var(--text-primary)" }}
+        >
+          {story.hook}
+        </p>
 
-          {app.href && app.href !== "#" && (
+        <p
+          className="text-sm leading-relaxed md:text-base"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          {story.body}
+        </p>
+
+        {hasShot && (
+          <div className="mt-auto pt-4">
             <AppLink
               href={app.href}
               external={app.external}
               label={buttonLabel}
             />
-          )}
-        </div>
-
-        <div className="flex-1" />
+          </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -141,7 +130,6 @@ function AppFeature({ app, index }: { app: App; index: number }) {
  * AppLink — vybere správný typ odkazu.
  * Interní appky → next/link (client-side routing, prefetch).
  * Externí appky → <a target="_blank"> (no opener, no referrer).
- * Žádný href → nic.
  */
 function AppLink({
   href,
