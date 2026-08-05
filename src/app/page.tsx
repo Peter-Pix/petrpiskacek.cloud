@@ -1,7 +1,7 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import AppGrid from "@/components/AppGrid";
-import LiveStatus from "@/components/LiveStatus";
+import ClosingCTA from "@/components/ClosingCTA";
 import { Footer } from "@piskacek/ui";
 
 export default function Home() {
@@ -62,7 +62,7 @@ export default function Home() {
       {/* Rychlost a duše — kreativní a agilní nástroje */}
       <AppGrid ids={["sparring", "flash-ui", "terminall"]} />
 
-      <LiveStatus />
+      <ClosingCTA />
 
       <Footer />
     </main>
