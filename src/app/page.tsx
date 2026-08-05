@@ -33,7 +33,8 @@ export default function Home() {
         </div>
       </section>
 
-      <AppGrid />
+      {/* Jádro — nástroje, které nastavují laťku */}
+      <AppGrid ids={["karel", "4rap", "docbot"]} />
 
       {/* Rychle s duší. + Vyšší úroveň. — pár */}
       <section className="section-apple">
@@ -57,6 +58,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Rychlost a duše — kreativní a agilní nástroje */}
+      <AppGrid ids={["sparring", "flash-ui", "terminall"]} />
 
       <LiveStatus />
 

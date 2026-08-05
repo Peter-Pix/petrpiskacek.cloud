@@ -38,13 +38,15 @@ const STORIES: Record<string, { hook: string; body: string }> = {
   },
 };
 
-export default function AppGrid() {
+export default function AppGrid({ ids }: { ids?: string[] }) {
+  const visibleApps = ids ? apps.filter((a) => ids.includes(a.id)) : apps;
+
   return (
     <section id="apps" className="section-apple">
       <div className="container-apple">
         {/* Jedna appka na řádek — na mobilu i desktopu. Velké rozestupy. */}
         <div className="space-y-40 md:space-y-64">
-          {apps.map((app) => (
+          {visibleApps.map((app) => (
             <AppRow key={app.id} app={app} />
           ))}
         </div>
