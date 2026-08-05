@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { apps, type App } from "@/lib/apps";
 
@@ -42,7 +43,7 @@ export default function AppGrid() {
     <section id="apps" className="section-apple">
       <div className="container-apple">
         {/* Jedna appka na řádek — na mobilu i desktopu. Velké rozestupy. */}
-        <div className="space-y-24 md:space-y-40">
+        <div className="space-y-40 md:space-y-64">
           {apps.map((app, idx) => (
             <AppRow key={app.id} app={app} index={idx} />
           ))}
@@ -53,6 +54,25 @@ export default function AppGrid() {
 }
 
 function AppRow({ app, index }: { app: App; index: number }) {
+  const ref = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const story = STORIES[app.id] || { hook: app.tagline, body: app.description };
   const status = statusLabels[app.status];
   const buttonLabel = app.external ? "Otevřít aplikaci" : "Spustit";
@@ -61,7 +81,14 @@ function AppRow({ app, index }: { app: App; index: number }) {
   const reverse = index % 2 === 1;
 
   return (
-    <article className="group">
+    <article
+      ref={ref}
+      className={`group transition-all duration-700 ease-out ${
+        visible
+          ? "translate-y-0 opacity-100"
+          : "translate-y-8 opacity-0"
+      }`}
+    >
       <div
         className={`flex flex-col gap-8 md:flex-row md:items-center md:gap-16 ${
           reverse ? "md:flex-row-reverse" : ""
