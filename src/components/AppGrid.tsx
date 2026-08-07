@@ -125,7 +125,7 @@ function AppRow({ app }: { app: App }) {
       <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
         <p
           className="text-3xl font-light leading-tight tracking-tight md:text-5xl"
-          style={{ color: "var(--text-primary)" }}
+          style={{ color: "#71717a" }}
         >
           {story.hook}
         </p>
