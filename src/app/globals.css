@@ -202,6 +202,13 @@ body {
   font-weight: 600;
   letter-spacing: -0.01em;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 60vw;
+}
+
+@media (min-width: 640px) {
+  .btn-apple {
+    max-width: none;
+  }
 }
 
 .btn-apple-primary {
