@@ -147,7 +147,7 @@ function AppRow({ app }: { app: App }) {
       <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px]">
         <p
           className="text-base font-medium leading-relaxed md:text-lg"
-          style={{ color: "var(--text-secondary)" }}
+          style={{ color: "#71717a" }}
         >
           {story.body}
         </p>
