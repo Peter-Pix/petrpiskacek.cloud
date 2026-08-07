@@ -90,22 +90,8 @@ function AppRow({ app }: { app: App }) {
           : "translate-y-8 opacity-0"
       }`}
     >
-      {/* Screenshot — full width nahoře, na mobilu i desktopu */}
-      {hasShot && (
-        <div className="mb-6 md:mb-10">
-          <div className="card-hover overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)]">
-            <img
-              src={`/screenshots/${app.id}.jpg`}
-              alt={`Screenshot aplikace ${app.name}`}
-              loading="lazy"
-              className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Velký název + hák — vlevo */}
-      <div className="flex flex-col items-start">
+      {/* Název + status — nahoře */}
+      <div className="flex flex-col items-start mb-6 md:mb-10">
         <div className="flex items-center gap-3">
           <h3 className="text-3xl font-semibold md:text-5xl">{app.name}</h3>
           <span
@@ -119,26 +105,43 @@ function AppRow({ app }: { app: App }) {
             {status.label}
           </span>
         </div>
+      </div>
 
+      {/* Screenshot — pod názvem */}
+      {hasShot && (
+        <div className="mb-6 md:mb-10">
+          <div className="card-hover overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--card-shadow)]">
+            <img
+              src={`/screenshots/${app.id}.jpg`}
+              alt={`Screenshot aplikace ${app.name}`}
+              loading="lazy"
+              className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Velký hák — vlevo */}
+      <div className="flex flex-col items-start">
         <p
-          className="mt-3 text-3xl font-light leading-tight tracking-tight md:text-5xl"
+          className="text-3xl font-light leading-tight tracking-tight md:text-5xl"
           style={{ color: "var(--text-primary)" }}
         >
           {story.hook}
         </p>
       </div>
 
-      {/* Popis + CTA — pod nápisem, vlevo, max 800px (1000px na velkých) */}
-      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px]">
+      {/* Popis + CTA — vpravo zarovnané */}
+      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px] flex flex-col items-end">
         <p
-          className="text-base font-medium leading-relaxed md:text-lg"
+          className="text-base font-medium leading-relaxed md:text-lg text-right"
           style={{ color: "var(--text-secondary)" }}
         >
           {story.body}
         </p>
 
         {hasShot && (
-          <div className="mt-5">
+          <div className="mt-5 flex justify-end w-full">
             <AppLink
               href={app.href}
               external={app.external}
@@ -172,7 +175,7 @@ function AppLink({
   appName: string;
 }) {
   const className =
-    "group inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all";
+    "group inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all max-w-[60vw] md:max-w-none";
   const style = {
     backgroundColor: "rgba(200, 150, 46, 0.12)",
     color: "var(--gold)",

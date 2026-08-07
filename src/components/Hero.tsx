@@ -103,18 +103,18 @@ export default function Hero() {
             className="subhead mx-auto mb-10 max-w-xl animate-fade-in-up"
             style={{ animationDelay: "0.3s" }}
           >
-            Vymýšlení nástrojů, posouvání hranice.
+            Vytváření nástrojů, posouvání hranice.
           </p>
 
           <div
             className="flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up"
             style={{ animationDelay: "0.4s" }}
           >
-            <a href="#apps" className="btn-apple btn-apple-primary w-full sm:w-auto">
-              Prohlédnout appky
+            <a href="#apps" className="btn-apple w-full sm:w-auto text-white border-transparent bg-transparent">
+              Chci to vidět
             </a>
             <a href="/challenge" className="btn-apple btn-apple-secondary w-full sm:w-auto">
-              Otestuj AI konzultanta
+              Vyzkoušej to
             </a>
           </div>
         </div>

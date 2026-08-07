@@ -29,7 +29,7 @@ export default function ClosingCTA() {
               className="mx-auto max-w-xl text-base leading-relaxed md:text-lg"
               style={{ color: "var(--text-secondary)" }}
             >
-              Napište cokoliv. Pomocník se doptá, vytvoří návrh, cenu a plán.
+              Cokoliv vás napadne. Aplikace doladí vizi, návrh i plán.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-3 pt-4 sm:flex-row">
@@ -40,7 +40,7 @@ export default function ClosingCTA() {
                   trackEvent("click_cta", { cta: "sparring", location: "closing" })
                 }
               >
-                Otestuj AI konzultanta →
+                Vyzkoušej to →
               </Link>
               <a
                 href="#apps"
