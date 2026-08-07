@@ -121,27 +121,17 @@ function AppRow({ app }: { app: App }) {
         </div>
       )}
 
-      {/* Velký hák — vlevo */}
-      <div className="flex flex-col items-start">
+      {/* Velký hák — vlevo, tlačítko vpravo (jen velké obrazovky) */}
+      <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
         <p
           className="text-3xl font-light leading-tight tracking-tight md:text-5xl"
           style={{ color: "var(--text-primary)" }}
         >
           {story.hook}
         </p>
-      </div>
-
-      {/* Popis + CTA — text vlevo, tlačítko vpravo */}
-      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px]">
-        <p
-          className="text-base font-medium leading-relaxed md:text-lg"
-          style={{ color: "var(--text-secondary)" }}
-        >
-          {story.body}
-        </p>
 
         {hasShot && (
-          <div className="mt-5 flex justify-end">
+          <div className="shrink-0">
             <AppLink
               href={app.href}
               external={app.external}
@@ -151,6 +141,16 @@ function AppRow({ app }: { app: App }) {
             />
           </div>
         )}
+      </div>
+
+      {/* Popis — text vlevo */}
+      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px]">
+        <p
+          className="text-base font-medium leading-relaxed md:text-lg"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          {story.body}
+        </p>
       </div>
     </article>
   );
@@ -175,11 +175,7 @@ function AppLink({
   appName: string;
 }) {
   const className =
-    "group inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all max-w-[60vw] md:max-w-none";
-  const style = {
-    backgroundColor: "rgba(200, 150, 46, 0.12)",
-    color: "var(--gold)",
-  };
+    "group btn-app-ghost inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-medium transition-all duration-500 max-w-[60vw] md:max-w-none";
   const arrow = (
     <span className="transition-transform duration-200 group-hover:translate-x-1">
       →
@@ -193,7 +189,6 @@ function AppLink({
         target="_blank"
         rel="noopener noreferrer"
         className={className}
-        style={style}
         onClick={() => trackEvent("click_app", { app: appId, name: appName })}
       >
         <span>{label}</span>
@@ -206,7 +201,6 @@ function AppLink({
     <Link
       href={href}
       className={className}
-      style={style}
       onClick={() => trackEvent("click_app", { app: appId, name: appName })}
     >
       <span>{label}</span>

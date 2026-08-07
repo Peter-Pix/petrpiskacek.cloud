@@ -227,6 +227,19 @@ body {
   background: rgba(200, 150, 46, 0.06);
 }
 
+/* Ghost tlačítko aplikací — průsvitné, výplň až při hoveru */
+.btn-app-ghost {
+  border-color: var(--border);
+  color: var(--text);
+  background-color: rgba(200, 150, 46, 0.08);
+}
+
+.btn-app-ghost:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background-color: rgba(200, 150, 46, 0.12);
+}
+
 /* Apple nav */
 .nav-apple {
   position: fixed;
