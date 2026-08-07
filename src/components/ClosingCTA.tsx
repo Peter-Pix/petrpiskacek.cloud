@@ -29,7 +29,7 @@ export default function ClosingCTA() {
               className="mx-auto max-w-xl text-base leading-relaxed md:text-lg"
               style={{ color: "var(--text-secondary)" }}
             >
-              Cokoliv vás napadne. Aplikace doladí vizi, návrh i plán.
+              Pomocník vybrousí vizi, návrh i plán.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-3 pt-4 sm:flex-row">

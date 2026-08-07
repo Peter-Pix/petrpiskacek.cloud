@@ -113,7 +113,7 @@ export default function Hero() {
             <a href="#apps" className="btn-apple btn-apple-primary w-full sm:w-auto max-w-[60vw] sm:max-w-none">
               Chci to vidět
             </a>
-            <a href="/challenge" className="btn-apple w-full sm:w-auto max-w-[60vw] sm:max-w-none border bg-transparent" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
+            <a href="/challenge" className="btn-apple btn-apple-secondary w-full sm:w-auto max-w-[60vw] sm:max-w-none">
               Vyzkoušej to
             </a>
           </div>

@@ -131,17 +131,17 @@ function AppRow({ app }: { app: App }) {
         </p>
       </div>
 
-      {/* Popis + CTA — vpravo zarovnané */}
-      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px] flex flex-col items-end">
+      {/* Popis + CTA — text vlevo, tlačítko vpravo */}
+      <div className="mt-5 max-w-[800px] 2xl:max-w-[1000px]">
         <p
-          className="text-base font-medium leading-relaxed md:text-lg text-right"
+          className="text-base font-medium leading-relaxed md:text-lg"
           style={{ color: "var(--text-secondary)" }}
         >
           {story.body}
         </p>
 
         {hasShot && (
-          <div className="mt-5 flex justify-end w-full">
+          <div className="mt-5 flex justify-end">
             <AppLink
               href={app.href}
               external={app.external}
