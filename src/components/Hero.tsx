@@ -110,10 +110,10 @@ export default function Hero() {
             className="flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up"
             style={{ animationDelay: "0.4s" }}
           >
-            <a href="#apps" className="btn-apple w-full sm:w-auto text-white border-transparent bg-transparent">
+            <a href="#apps" className="btn-apple btn-apple-primary w-full sm:w-auto max-w-[60vw] sm:max-w-none">
               Chci to vidět
             </a>
-            <a href="/challenge" className="btn-apple btn-apple-secondary w-full sm:w-auto">
+            <a href="/challenge" className="btn-apple w-full sm:w-auto max-w-[60vw] sm:max-w-none border bg-transparent" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
               Vyzkoušej to
             </a>
           </div>
