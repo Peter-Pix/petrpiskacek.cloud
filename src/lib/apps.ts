@@ -44,7 +44,7 @@ export const apps: App[] = [
     tagline: "Generuj UI komponenty z promptu",
     description:
       "Design pro váš web. Přidejte nový formulář, chat, ceník. Cokoliv jen chcete.",
-    status: "beta",
+    status: "online",
     href: "/flash-ui",
     external: false,
     category: "tool",
@@ -68,7 +68,7 @@ export const apps: App[] = [
     tagline: "AI právník na český smlouvy",
     description:
       "Žádné ruční vyplňování. Smlouvy snadno a rychle. Dělejte to jednoduše.",
-    status: "beta",
+    status: "online",
     href: "https://docbot.petrpiskacek.cloud",
     external: true,
     category: "ai",
