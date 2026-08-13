@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored compiled UI package — linted at source (ecosystem-dashboard/packages/ui)
+    "src/vendor/ui/dist/**",
+    // Standalone Node.js script (CommonJS) — not part of the Next.js app
+    "generate_og.js",
   ]),
 ]);
 
