@@ -97,27 +97,6 @@ export default function ChallengeForm() {
     setLoading(false);
   }
 
-  function buildMailtoUrl(): string {
-    const subject = "Návrh AI řešení — Sparring (petrpiskacek.cloud)";
-    const body = [
-      "Ahoj Petře,",
-      "",
-      "posílám návrh AI řešení, který jsem si nechal vygenerovat na Sparringu (petrpiskacek.cloud/challenge).",
-      "",
-      "Zadání:",
-      prompt.trim(),
-      "",
-      "---",
-      "",
-      ...sections.flatMap((s) => [`## ${s.title}`, s.content, ""]),
-      "---",
-      "",
-      "Vygenerováno živě pomocí Petr's AI stacku.",
-    ].join("\n");
-
-    return `mailto:ppix50@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }
-
   return (
     <section className="section-apple">
       <div className="container-narrow">
@@ -254,12 +233,6 @@ export default function ChallengeForm() {
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
             Generováno živě pomocí Petr&apos;s AI stacku.
             </p>
-            <a
-              href={buildMailtoUrl()}
-              className="btn-apple btn-apple-primary mt-4 inline-flex items-center gap-2"
-            >
-              Poslat emailem
-            </a>
           </div>
         )}
 
