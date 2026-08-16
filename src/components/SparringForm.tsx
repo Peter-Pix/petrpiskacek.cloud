@@ -223,6 +223,75 @@ export default function SparringForm() {
     setError("");
   }
 
+  function buildMailtoUrl(): string {
+    const subject = "Návrh projektu — Sparring (petrpiskacek.cloud)";
+    const lines: string[] = [
+      "Ahoj Petře,",
+      "",
+      "posílám návrh projektu, který jsem si nechal promyslet na Sparringu (petrpiskacek.cloud/challenge).",
+      "",
+      "Zadání:",
+      prompt.trim(),
+      "",
+    ];
+
+    // Odpovědi na doplňující otázky
+    const answered = Object.entries(answers).filter(([, v]) => v.trim());
+    if (answered.length > 0) {
+      lines.push("Doplňující info:", "");
+      for (const [, v] of answered) {
+        lines.push(`- ${v.trim()}`);
+      }
+      lines.push("");
+    }
+
+    lines.push("---", "");
+
+    // Jednotlivé bloky
+    const blockTitles: Record<BlockKind, string> = {
+      core: "Jádro",
+      stack: "Stack",
+      costs: "Náklady",
+      timeline: "Postup",
+    };
+
+    for (const kind of BLOCK_ORDER) {
+      const bm = blocks[kind];
+      if (!bm) continue;
+      const b = bm.block;
+      lines.push(`## ${blockTitles[kind]}`, "");
+      if (b.kind === "core") {
+        lines.push(`Co to je: ${b.what}`);
+        lines.push(`Pro koho: ${b.forWhom}`);
+        lines.push(`Hlavní feature: ${b.mainFeature}`);
+      } else if (b.kind === "stack") {
+        lines.push(`Frontend: ${b.frontend}`);
+        lines.push(`Backend: ${b.backend}`);
+        lines.push(`Databáze: ${b.database}`);
+        lines.push(`AI: ${b.ai}`);
+        lines.push(`Infra: ${b.infra}`);
+      } else if (b.kind === "costs") {
+        lines.push(`Jednorázově: ${b.oneTime}`);
+        lines.push(`Měsíčně: ${b.monthly}`);
+        lines.push(`MVP: ${b.mvp}`);
+        if (b.note) lines.push(`Poznámka: ${b.note}`);
+      } else if (b.kind === "timeline") {
+        lines.push(`Fáze 1 (1-2 týdny): ${b.prvniFaze}`);
+        lines.push(`Fáze 2 (2-4 týdny): ${b.druhaFaze}`);
+        lines.push(`Fáze 3 (1+ měsíc): ${b.tretiFaze}`);
+      }
+      if (bm.expansion) {
+        lines.push("", `Rozšíření: ${bm.expansion}`);
+      }
+      lines.push("");
+    }
+
+    lines.push("---", "", "Vygenerováno živě pomocí Petr's AI stacku.");
+
+    const body = lines.join("\n");
+    return `mailto:ppix50@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
   return (
     <section className="section-apple">
       <div className="container-narrow">
@@ -514,6 +583,16 @@ export default function SparringForm() {
               >
                 Plán je hotový. Můžeš ho rozšířit na jednotlivých blocích, nebo začít znovu.
               </p>
+              <a
+                href={buildMailtoUrl()}
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all"
+                style={{
+                  backgroundColor: "var(--gold)",
+                  color: "var(--text-inverse)",
+                }}
+              >
+                Poslat emailem
+              </a>
               <button
                 onClick={handleReset}
                 className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all"
