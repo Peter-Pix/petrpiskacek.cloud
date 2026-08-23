@@ -7,6 +7,7 @@ import { SiteSwitcher } from "@piskacek/ui";
 
 const links = [
   { href: "/", label: "Domů" },
+  { href: "/ai-worker", label: "AI Worker" },
   { href: "/challenge", label: "Otestuj mě" },
   { href: "/flash-ui", label: "Flash UI" },
 ];
