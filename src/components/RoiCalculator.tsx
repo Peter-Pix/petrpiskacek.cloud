@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent } from "@/lib/track";
 
 interface RoiResult {
   monthlyWaste: number;
@@ -21,6 +22,15 @@ export default function RoiCalculator() {
   const [coverage, setCoverage] = useState(70);
   const [setup, setSetup] = useState(50000);
   const [monthly, setMonthly] = useState(15000);
+  const [tracked, setTracked] = useState(false);
+
+  // Trackuje první interakci s kalkulačkou (zájem o AI Workera) — ne každou změnu.
+  const trackOnce = (field: string) => {
+    if (!tracked) {
+      setTracked(true);
+      trackEvent("roi_calc_interact", { field });
+    }
+  };
 
   const fmt = (n: number) =>
     new Intl.NumberFormat("cs-CZ", {
@@ -46,12 +56,12 @@ export default function RoiCalculator() {
     <div className="mx-auto max-w-3xl">
       <div className="rounded-3xl border p-8" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Field label="Hodin týdně na rutině (na osobu)" value={hours} onChange={setHours} step={1} suffix="h" />
-          <Field label="Počet lidí v procesu" value={people} onChange={setPeople} step={1} suffix="" />
-          <Field label="Hodinová cena zaměstnance (s overheadem)" value={hourly} onChange={setHourly} step={50} suffix="Kč" />
-          <Field label="Podíl rutiny, který převezme AI" value={coverage} onChange={setCoverage} step={5} suffix="%" />
-          <Field label="Jednorázový setup" value={setup} onChange={setSetup} step={5000} suffix="Kč" />
-          <Field label="Měsíční provoz AI Workera" value={monthly} onChange={setMonthly} step={1000} suffix="Kč" />
+          <Field label="Hodin týdně na rutině (na osobu)" value={hours} onChange={(v) => { setHours(v); trackOnce("hours"); }} step={1} suffix="h" />
+          <Field label="Počet lidí v procesu" value={people} onChange={(v) => { setPeople(v); trackOnce("people"); }} step={1} suffix="" />
+          <Field label="Hodinová cena zaměstnance (s overheadem)" value={hourly} onChange={(v) => { setHourly(v); trackOnce("hourly"); }} step={50} suffix="Kč" />
+          <Field label="Podíl rutiny, který převezme AI" value={coverage} onChange={(v) => { setCoverage(v); trackOnce("coverage"); }} step={5} suffix="%" />
+          <Field label="Jednorázový setup" value={setup} onChange={(v) => { setSetup(v); trackOnce("setup"); }} step={5000} suffix="Kč" />
+          <Field label="Měsíční provoz AI Workera" value={monthly} onChange={(v) => { setMonthly(v); trackOnce("monthly"); }} step={1000} suffix="Kč" />
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">

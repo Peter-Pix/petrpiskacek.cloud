@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import TrackedCta from "@/components/TrackedCta";
 import RoiCalculator from "@/components/RoiCalculator";
 import { Footer } from "@piskacek/ui";
 
@@ -27,12 +28,21 @@ export default function AiWorkerPage() {
               Ne prodávání slibů: ukážu reálné výsledky, které systém už vyprodukoval.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a href="mailto:petr@piskacek.cz?subject=AI%20Worker%20—%20demo" className="btn-apple btn-apple-primary">
+              <TrackedCta
+                href="mailto:petr@piskacek.cz?subject=AI%20Worker%20—%20demo"
+                eventName="click_cta"
+                params={{ cta: "ai_worker_demo", location: "hero" }}
+              >
                 Domluvit 20minutové demo
-              </a>
-              <a href="#roi" className="btn-apple btn-apple-secondary">
+              </TrackedCta>
+              <TrackedCta
+                href="#roi"
+                eventName="click_cta"
+                params={{ cta: "ai_worker_roi", location: "hero" }}
+                variant="secondary"
+              >
                 Spočítat si úsporu
-              </a>
+              </TrackedCta>
             </div>
           </div>
         </div>
@@ -138,9 +148,13 @@ export default function AiWorkerPage() {
               20 minut. Žádný závazek. Ukážu konkrétní úsporu na vašich číslech.
             </p>
             <div className="mt-8">
-              <a href="mailto:petr@piskacek.dev?subject=AI%20Worker%20—%20demo" className="btn-apple btn-apple-primary">
+              <TrackedCta
+                href="mailto:petr@piskacek.dev?subject=AI%20Worker%20—%20demo"
+                eventName="click_cta"
+                params={{ cta: "ai_worker_demo", location: "closing" }}
+              >
                 Domluvit demo
-              </a>
+              </TrackedCta>
             </div>
           </div>
         </div>
