@@ -14,7 +14,7 @@ export async function POST() {
       },
     });
 
-    // We try gpt-oss:20b first, if it fails or quality is low, we can switch to 120b or others.
+    // Primární model gemma4:31b (kvalitnější čeština a konkrétnost, A/B test 23.8.2026)
     const response = await ollama.generate({
       model: MODELS.randomPrompt,
       prompt: `Jsi expert na business analýzu a design thinking. Tvým úkolem je vygenerovat JEDEN krátký, autentický popis business potřeby majitele firmy.

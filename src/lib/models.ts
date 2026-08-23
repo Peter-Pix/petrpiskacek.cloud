@@ -6,13 +6,13 @@ export const MODELS = {
   flashUI: "deepseek-v4-flash",
 
   // Sparring — multipurpose: clarify, expand, block generation
-  sparring: "gpt-oss:20b",
+  sparring: "gemma4:31b",
 
   // Challenge — solution architect, kvalitní Markdown
   challenge: "anthropic/claude-3.5-sonnet",
 
   // Random prompts — kreativní nápady, méně konzistentní
-  randomPrompt: "gpt-oss:20b",
+  randomPrompt: "gemma4:31b",
 } as const;
 
 export type ModelKey = keyof typeof MODELS;
