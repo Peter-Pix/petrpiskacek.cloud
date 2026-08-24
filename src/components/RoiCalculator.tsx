@@ -20,8 +20,8 @@ export default function RoiCalculator() {
   const [people, setPeople] = useState(3);
   const [hourly, setHourly] = useState(350);
   const [coverage, setCoverage] = useState(70);
-  const [setup, setSetup] = useState(50000);
-  const [monthly, setMonthly] = useState(15000);
+  const [setup, setSetup] = useState(80000);
+  const [monthly, setMonthly] = useState(20000);
   const [tracked, setTracked] = useState(false);
 
   // Trackuje první interakci s kalkulačkou (zájem o AI Workera) — ne každou změnu.

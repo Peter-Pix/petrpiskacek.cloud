@@ -135,6 +135,71 @@ export default function AiWorkerPage() {
         </div>
       </section>
 
+      {/* CENÍK */}
+      <section id="cenik" className="section-apple" style={{ paddingTop: "4rem" }}>
+        <div className="container-apple">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow">Ceník</p>
+            <h2 className="text-4xl font-light tracking-tight md:text-5xl" style={{ color: "var(--text-primary)" }}>
+              Jedna cena. Žádné rozpětí.
+            </h2>
+            <p className="mt-4 text-lg" style={{ color: "var(--text-secondary)" }}>
+              Prodávám výsledek, ne hodiny. Fixní cena za outcome — jedno číslo, co se dá říct nahlas.
+            </p>
+          </div>
+
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                name: "Pilot",
+                price: "20 000 Kč",
+                unit: "1 měsíc",
+                desc: "Ověřovací nasazení na 1 use-case. Zjistíte, co AI Worker umí na vašich datech.",
+                highlight: false,
+              },
+              {
+                name: "Full setup",
+                price: "80 000 Kč",
+                unit: "jednorázově",
+                desc: "Kompletní nasazení AI Workera. Rozsah 60–100k dle komplexity.",
+                highlight: true,
+              },
+              {
+                name: "Měsíční provoz",
+                price: "20 000 Kč",
+                unit: "měsíčně",
+                desc: "Retainer — agent běží, reportuje, škáluje se. Rozsah 15–30k.",
+                highlight: false,
+              },
+              {
+                name: "Extra use-case",
+                price: "+15 000 Kč",
+                unit: "za proces",
+                desc: "Rozšíření na další automatizovaný proces nad rámec základu.",
+                highlight: false,
+              },
+            ].map((tier) => (
+              <div
+                key={tier.name}
+                className="bento-item flex flex-col"
+                style={tier.highlight ? { borderColor: "var(--accent)", background: "var(--accent-soft)" } : undefined}
+              >
+                <p className="eyebrow">{tier.name}</p>
+                <div className="mt-3 text-3xl font-light" style={{ color: tier.highlight ? "var(--accent)" : "var(--text-primary)" }}>
+                  {tier.price}
+                </div>
+                <div className="text-sm" style={{ color: "var(--text-muted)" }}>{tier.unit}</div>
+                <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>{tier.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mx-auto mt-8 max-w-2xl text-center text-sm" style={{ color: "var(--text-muted)" }}>
+            Návratnost: setup 80 000 Kč se typicky vrátí za 1 měsíc provozu. Kalkulačka výše to spočítá na vašich číslech.
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="section-apple" style={{ paddingTop: "4rem" }}>
         <div className="container-apple">
