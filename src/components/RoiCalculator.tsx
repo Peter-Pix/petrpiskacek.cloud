@@ -46,7 +46,9 @@ export default function RoiCalculator() {
     const monthlySaving = monthlyWaste * coverage / 100;
     const yearlyCost = setup + monthly * 12;
     const netYear1 = (yearlyWaste * coverage / 100) - yearlyCost;
-    const roiMonths = monthlySaving > 0 ? setup / monthlySaving : 0;
+    // Návratnost setupu zohledňuje měsíční retainer — čistá úspora po odečtení provozu.
+    const netMonthly = monthlySaving - monthly;
+    const roiMonths = netMonthly > 0 ? setup / netMonthly : 0;
     return { monthlyWaste, yearlyWaste, monthlySaving, netYear1, roiMonths };
   };
 
