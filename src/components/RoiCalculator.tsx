@@ -9,11 +9,17 @@ interface RoiResult {
   monthlySaving: number;
   netYear1: number;
   roiMonths: number;
+  netMonthly: number;
 }
 
 /**
  * RoiCalculator — interaktivní kalkulačka úspory pro AI Workera.
  * Port z roi-calculator.html (pay-me-Im-worth-it). Transparentní model.
+ *
+ * Finanční model: setup se splácí PROGRESIVNĚ z reálných úspor (pay-as-you-save).
+ * Klient si nechává 30 % z čisté úspory, zbytek jde na splátku setupu — dokud není
+ * zaplacen. Pak si klient nechává 100 %.
+ * Riziko nese dodavatel → záruka 100% vrácení peněz do 60 dnů.
  */
 export default function RoiCalculator() {
   const [hours, setHours] = useState(20);
@@ -24,7 +30,6 @@ export default function RoiCalculator() {
   const [monthly, setMonthly] = useState(20000);
   const [tracked, setTracked] = useState(false);
 
-  // Trackuje první interakci s kalkulačkou (zájem o AI Workera) — ne každou změnu.
   const trackOnce = (field: string) => {
     if (!tracked) {
       setTracked(true);
@@ -46,13 +51,18 @@ export default function RoiCalculator() {
     const monthlySaving = monthlyWaste * coverage / 100;
     const yearlyCost = setup + monthly * 12;
     const netYear1 = (yearlyWaste * coverage / 100) - yearlyCost;
-    // Návratnost setupu zohledňuje měsíční retainer — čistá úspora po odečtení provozu.
     const netMonthly = monthlySaving - monthly;
     const roiMonths = netMonthly > 0 ? setup / netMonthly : 0;
-    return { monthlyWaste, yearlyWaste, monthlySaving, netYear1, roiMonths };
+    return { monthlyWaste, yearlyWaste, monthlySaving, netYear1, roiMonths, netMonthly };
   };
 
   const r = calc();
+
+  // Progresivní splátka: 70 % z čisté úspory jde na setup, dokud není zaplacen.
+  const installment = r.netMonthly > 0 ? r.netMonthly * 0.7 : 0;
+  const keepForClient = r.netMonthly > 0 ? r.netMonthly * 0.3 : 0;
+  const hasSetup = setup > 0 && installment > 0;
+  const monthsToPayOff = hasSetup ? Math.ceil(setup / installment) : 0;
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -71,6 +81,36 @@ export default function RoiCalculator() {
           <ResultCard label="Měsíční úspora s AI Workerem" value={fmt(r.monthlySaving)} accent />
           <ResultCard label="Čistá úspora za 1. rok" value={fmt(r.netYear1)} accent />
           <ResultCard label="Návratnost investice" value={r.roiMonths > 0 ? `~${Math.round(r.roiMonths)} měsíců` : "—"} accent />
+        </div>
+      </div>
+
+      {/* ══ PROGRESIVNÍ SPLÁCENÍ & ZÁRUKA ══ */}
+      <div className="mt-6 rounded-3xl border-2 p-8" style={{ borderColor: "var(--accent)", background: "var(--accent-soft)" }}>
+        <h3 className="text-xl font-semibold" style={{ color: "var(--accent)" }}>
+          🛡️ Splácíte z vlastních úspor. Bez rizika.
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+          Setup nemusíte zaplatit najednou. Splácíte ho <strong>progresivně z úspor, které AI Worker reálně vygeneruje</strong>.
+          70 % z čisté měsíční úspory jde na splátku setupu, zbylých 30 % si necháváte hned. Jakmile je setup zaplacen,
+          jde vám už 100 % úspor do kapsy.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ResultCard label="Progresivní splátka setupu (měsíčně)" value={installment > 0 ? fmt(installment) : "—"} accent />
+          <ResultCard label="Co vám zůstane hned (měsíčně)" value={keepForClient > 0 ? fmt(keepForClient) : "—"} accent />
+          <ResultCard label="Doba splacení setupu" value={monthsToPayOff > 0 ? `~ ${monthsToPayOff} měsíců` : "—"} accent />
+          <ResultCard label="Dopad na cashflow (čistá úspora)" value={r.netMonthly > 0 ? fmt(r.netMonthly) : "—"} accent />
+        </div>
+
+        <div className="mt-6 rounded-2xl p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+            Pokud to nefunguje — vrátíme vám naprosto všechno.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+            Pokud do <strong>60 dnů</strong> neuvidíte měřitelný výsledek, řeknete si, že to je &quot;na prd&quot;,
+            nebo zjistíte, že lidé to dělají líp — <strong>vracíme vám 100 % peněz</strong>.
+            Žádné malé písmo. Máme jasně měřitelné výsledky, tak si to můžeme dovolit.
+          </p>
         </div>
       </div>
     </div>
