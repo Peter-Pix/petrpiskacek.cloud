@@ -161,14 +161,14 @@ export default function AiWorkerPage() {
                 name: "Full setup",
                 price: "80 000 Kč",
                 unit: "jednorázově",
-                desc: "Kompletní nasazení AI Workera. Rozsah 60–100k dle komplexity.",
+                desc: "Kompletní nasazení AI Workera na vašich datech a workflow.",
                 highlight: true,
               },
               {
                 name: "Měsíční provoz",
                 price: "20 000 Kč",
                 unit: "měsíčně",
-                desc: "Retainer — agent běží, reportuje, škáluje se. Rozsah 15–30k.",
+                desc: "Retainer — agent běží, reportuje, škáluje se.",
                 highlight: false,
               },
               {
