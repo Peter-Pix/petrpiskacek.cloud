@@ -32,7 +32,7 @@ test.describe("AI Worker stránka", () => {
     // Hero
     await expect(page.getByText("Potřebuje AI pracovníka")).toBeVisible();
     // Case study 1 — Sovereign OS
-    await expect(page.getByText("36 firem v 9 sektorech")).toBeVisible();
+    await expect(page.getByText("50 firem v 13 sektorech")).toBeVisible();
     // Case study 2 — 4rap
     await expect(page.getByText("1 699 entit, 9 294 graf uzlů")).toBeVisible();
     // ROI kalkulačka

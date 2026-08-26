@@ -62,14 +62,14 @@ export default function AiWorkerPage() {
             {/* Case study 1 — Sovereign OS */}
             <div className="bento-item">
               <p className="eyebrow">Autonomní AI tým</p>
-              <h3 className="mt-2 text-2xl font-light">36 firem v 9 sektorech</h3>
+              <h3 className="mt-2 text-2xl font-light">50 firem v 13 sektorech</h3>
               <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 Sovereign OS — tým AI agentů (Scout, Strategist, Spine) reálně běžel a vygeneroval
-                36 kvalifikovaných B2B leadů napříč 9 sektory, každý se strukturovanou analýzou bolesti.
+                50 kvalifikovaných B2B leadů napříč 13 sektory, každý se strukturovanou analýzou bolesti.
               </p>
               <div className="mt-4 flex gap-3 text-sm">
-                <span className="rounded-full px-3 py-1" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>36 firem</span>
-                <span className="rounded-full px-3 py-1" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>9 sektorů</span>
+                <span className="rounded-full px-3 py-1" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>50 firem</span>
+                <span className="rounded-full px-3 py-1" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>13 sektorů</span>
               </div>
             </div>
 
