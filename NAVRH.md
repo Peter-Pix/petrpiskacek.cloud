@@ -19,107 +19,61 @@ Brand recognition > variace — zlatá zůstává.
 
 ---
 
-## Varianta A — "Live AI Lab" (dashboard)
+## Zvolená varianta: D — "Hybrid" (terminál hero + bento grid)
 
-### Struktura
+Kombinace terminálového hero (unikátní, technický vibe) + bento grid s live statusem (konzistentní s .cz).
 
-```
-petrpiskacek.cloud/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── globals.css
-│   │   ├── timeline/
-│   │   │   └── page.tsx
-│   │   ├── challenge/
-│   │   │   └── page.tsx
-│   │   ├── api/
-│   │   │   ├── status/route.ts
-│   │   │   └── challenge/route.ts
-│   │   └── robots.ts
-│   ├── components/
-│   │   ├── Nav.tsx
-│   │   ├── Hero.tsx
-│   │   ├── LiveStatus.tsx
-│   │   ├── Timeline.tsx
-│   │   ├── ChallengeForm.tsx
-│   │   └── icons.tsx
-│   └── lib/
-│       └── challenge.ts
-├── public/
-├── package.json
-└── tsconfig.json
-```
+- Unikátní hero (terminál) + konzistentní design (bento)
+- Technický vibe + Apple elegance
+- Dobře škálovatelné
+- Riziko: dva designové jazyky na jedné stránce → potřeba citlivě propojit
 
-### Stránky
+> ⚠️ **Poznámka k aktuálnímu stavu:** Homepage má bento grid, ale **terminál hero zatím chybí** — je to missing kus plánu (viz sekce "Současná implementace" níže).
 
-| Stránka | Účel |
-|---------|------|
-| `/` | Live AI Lab — dashboard běžících služeb + hero |
-| `/timeline` | Časová osa projektů s progress bary |
-| `/challenge` | AI solution generator (wow efekt) |
+---
 
-### Homepage layout
+## Současná implementace (stav k 26. 8. 2026)
 
-```
-┌─────────────────────────────────────────┐
-│  Nav: [petrpiskacek.cloud] [Timeline]   │
-│        [Challenge] [petrpiskacek.cz]     │
-├─────────────────────────────────────────┤
-│                                         │
-│  "I build AI systems                    │
-│   that automate real work."             │
-│                                         │
-│  Currently experimenting with:          │
-│  AI Agents • Knowledge Graphs • MCP     │
-│  Docker • LLMs • SEO Automation         │
-│                                         │
-├─────────────────────────────────────────┤
-│  Live AI Lab                            │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │ Image Generation  ● Running    │    │
-│  │ LLM API           ● Online      │    │
-│  │ Speech Recognition ● Running    │    │
-│  │ OCR               ● Running     │    │
-│  │ Workflow Engine   ● Running     │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  [Challenge Me]                          │
-│                                         │
-├─────────────────────────────────────────┤
-│  Timeline preview                       │
-│  2026                                   │
-│  AI Portfolio        ████████████ 100%  │
-│  4rap.cz             ████████████ 100%  │
-│  Knowledge Graph    ████████████ 100%  │
-│  AI Agent            ████████░░░  80%   │
-│  SEO Automation      ██████████░  90%   │
-│  Voice Models        ██████░░░░░  60%   │
-│                                         │
-│  [View full timeline →]                 │
-│                                         │
-├─────────────────────────────────────────┤
-│  Footer: © Petr Piskáček                │
-│  petrpiskacek.cz · petrpiskacek.cloud   │
-└─────────────────────────────────────────┘
-```
+### ✅ Live / Hotovo
+- **Design System**: Tailwind 4, gold accent (#c8962e), Apple-style komponenty.
+- **Stránky**: `/`, `/ai-worker`, `/challenge`, `/flash-ui`.
+- **API route**: `/api/flash-ui/random-prompt`, `/api/sparring/{block,clarify,expand,random-prompt}`.
+- **E2E testy**: Playwright testy pro stránky i API route.
+- **Vendor UI**: Sdílené komponenty v `src/vendor/ui` (mezistupeň k monorepu).
+- **SEO**: `robots.ts`, `sitemap.ts`.
 
-### Challenge Me flow
+### ❌ Chybí oproti plánu (priority)
+| Feature | Stav | Priorita |
+|---------|------|----------|
+| Live Status API (`/api/status`) | Není implementováno | 🔥 High |
+| Reálné endpointy (Image Gen, Speech Rec, OCR) | Fake/placeholder | 🔥 High |
+| Terminál hero | Chybí na homepage | 🔥 High |
+| Timeline stránka (`/timeline`) | Není, jen statický preview na homepage | High |
+| Challenge Me: Mermaid diagramy | Není (text-only) | Medium |
+| Active Agents feed | Není | Medium |
+| PDF export z Challenge | Není | Low |
 
-1. User napíše: "Build me an AI solution for a logistics company."
-2. Pošle se POST na `/api/challenge`
-3. OpenRouter streamuje odpověď po sekcích:
-   - Architecture
-   - Cost Estimate
-   - Roadmap
-   - Tech Stack
-   - Database Design
-   - Workflow
-4. Dole: "Generated live by Petr's AI stack."
+### 🔄 Změny oproti původnímu plánu
+- **Design**: Aktuální homepage je mix terminálu + bento (Varianta D), ale terminál hero chybí.
+- **Timeline**: Preview na homepage je hardcoded, ne dynamická stránka.
+- **Challenge Me**: Funguje, ale výstup je textový (bez Mermaid/PDF).
+- **Flash UI + AI Worker**: Přidáno (nebylo v původním návrhu) — rozšířeno o demo-stánky schopností.
 
-### Live status — reálné vs fake
+---
+
+## Stránky
+
+| Stránka | Účel | Stav |
+|---------|------|------|
+| `/` | Hybrid homepage — terminál hero + live status + timeline preview | ✅ (bez terminál hero) |
+| `/ai-worker` | Demo autonomního AI pracovníka | ✅ |
+| `/challenge` | AI solution generator (wow efekt) | ✅ (text-only) |
+| `/flash-ui` | Demo Flash UI (rychlé generování UI) | ✅ |
+| `/api/*` | Backend: flash-ui, sparring, (status chybí) | ✅ / ❌ |
+
+---
+
+## Live status — reálné vs fake
 
 | Služba | Reálná? | Implementace |
 |--------|---------|-------------|
@@ -129,244 +83,26 @@ petrpiskacek.cloud/
 | OCR | ❌ | Fake |
 | Workflow Engine | ❌ | Fake |
 
-Stačí pár reálných endpointů. Zbytek fake s ping animací — vypadá to, že něco běží.
-
-### Výhody
-- Jasná struktura, každá stránka má účel
-- Challenge Me je silný wow efekt
-- Live status dává důvěryhodnost
-- Timeline ukazuje aktivitu
-
-### Nevýhody
-- 3 stránky = víc práce
-- Challenge Me potřebuje OpenAI/OpenRouter API klíč
-- Live status je většinou fake
+**Cíl:** Přidat reálné endpointy + `/api/status` pro live health-check. Ideálně aspoň pár reálných služeb, zbytek může být fake s jasným označením "demo".
 
 ---
 
-## Varianta B — "Single Page Terminal" (minimal)
-
-### Koncept
-
-Jedna stránka. Vypadá jako terminál/CLI. Žádné obrázky, žádné karty. Čistě text.
-
-### Homepage
+## Architektura API (budoucí)
 
 ```
-┌─────────────────────────────────────────┐
-│  petrpiskacek.cloud — AI Infrastructure  │
-│  ─────────────────────────────────────  │
-│                                         │
-│  $ whoami                               │
-│  > Petr Piskáček                        │
-│  > AI Systems Architect                  │
-│  > 20 years in IT                       │
-│                                         │
-│  $ ./status                             │
-│  ┌─────────────────────────────────┐    │
-│  │ llm-api          ● online       │    │
-│  │ image-gen        ● online       │    │
-│  │ speech-rec       ● online       │    │
-│  │ ocr              ● online       │    │
-│  │ workflow         ● online       │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  $ ./timeline --year 2026               │
-│  AI Portfolio        [████████████] 100 │
-│  4rap.cz             [████████████] 100 │
-│  Knowledge Graph     [████████████] 100 │
-│  AI Agent            [████████░░░░]  80 │
-│  SEO Automation      [██████████░░]  90 │
-│  Voice Models        [██████░░░░░░]  60 │
-│                                         │
-│  $ ./challenge                          │
-│  > Build me an AI solution for...       │
-│  [type your challenge]                  │
-│                                         │
-│  [Generated response streams below]     │
-│                                         │
-│  ─────────────────────────────────────  │
-│  petrpiskacek.cz · github.com/Peter-Pix │
-└─────────────────────────────────────────┘
+/api
+├── status/          → health-check všech služeb (chybí)
+├── challenge/       → solution generator (text-only, chce Mermaid)
+├── flash-ui/        → random-prompt (hotovo)
+└── sparring/        → block/clarify/expand (hotovo)
 ```
-
-### Výhody
-- Extrémně rychlé na vývoj (1 stránka)
-- Unikátní, zapamatovatelné
-- Technický vibe — recruiteri to milujou
-- Žádné obrázky = rychlé načtení
-
-### Nevýhody
-- Méně přístupné pro ne-technické návštěvníky
-- Terminál design není pro každého
-- Méně prostoru pro detailní popis projektů
 
 ---
 
-## Varianta C — "Bento Grid Dashboard" (Apple-style)
+## Co dál (viz ROADMAP.md)
 
-### Koncept
-
-Apple-style dashboard. Velké karty v bento gridu. Každá karta = jedna služba/projekt.
-
-### Homepage layout
-
-```
-┌─────────────────────────────────────────┐
-│  Nav: [petrpiskacek.cloud]              │
-├─────────────────────────────────────────┤
-│                                         │
-│  petrpiskacek.cloud                     │
-│  AI Infrastructure & Experiments       │
-│                                         │
-├─────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐    │
-│  │ LLM API      │  │ Image Gen    │    │
-│  │ ● Online     │  │ ● Running    │    │
-│  │ 200ms avg    │  │ 1.2s avg     │    │
-│  │ 1.2k req/d   │  │ 45 req/d     │    │
-│  └──────────────┘  └──────────────┘    │
-│  ┌──────────────┐  ┌──────────────┐    │
-│  │ Speech Rec   │  │ OCR          │    │
-│  │ ● Running    │  │ ● Running    │    │
-│  │ 300ms avg    │  │ 800ms avg    │    │
-│  └──────────────┘  └──────────────┘    │
-│  ┌──────────────────────────────┐      │
-│  │ Workflow Engine              │      │
-│  │ ● Running                    │      │
-│  │ 12 active workflows          │      │
-│  └──────────────────────────────┘      │
-├─────────────────────────────────────────┤
-│  Timeline (horizontal scroll)           │
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐  │
-│  │AI    │ │4rap  │ │KG    │ │Agent │  │
-│  │100%  │ │100%  │ │100%  │ │80%   │  │
-│  └──────┘ └──────┘ └──────┘ └──────┘  │
-├─────────────────────────────────────────┤
-│  [Challenge Me]                         │
-│  ┌─────────────────────────────────┐    │
-│  │ Build me an AI solution for...  │    │
-│  │ [Generate]                      │    │
-│  └─────────────────────────────────┘    │
-└─────────────────────────────────────────┘
-```
-
-### Výhody
-- Apple design language — konzistentní s .cz
-- Každá služba má vlastní kartu s metrikami
-- Vizuálně působivé
-- Dobře škálovatelné (přidat/odebrat karty)
-
-### Nevýhody
-- Víc CSS práce (bento grid, karty)
-- Metriky jsou fake (pokud nemáš reálná data)
-- Méně unikátní než terminál varianta
-
----
-
-## Varianta D — "Hybrid" (doporučená)
-
-### Koncept
-
-Kombinace B + C. Homepage je terminálový hero (unikátní, technický), pod ním bento grid s live statusem (Apple design, konzistentní s .cz).
-
-### Homepage layout
-
-```
-┌─────────────────────────────────────────┐
-│  Nav: [petrpiskacek.cloud] [Timeline]   │
-│        [Challenge] [petrpiskacek.cz]     │
-├─────────────────────────────────────────┤
-│                                         │
-│  $ whoami                               │
-│  > Petr Piskáček                        │
-│  > I build AI systems                   │
-│  > that automate real work.            │
-│                                         │
-│  Currently experimenting with:          │
-│  AI Agents • Knowledge Graphs • MCP     │
-│  Docker • LLMs • SEO Automation         │
-│                                         │
-├─────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐    │
-│  │ LLM API      │  │ Image Gen    │    │
-│  │ ● Online     │  │ ● Running    │    │
-│  └──────────────┘  └──────────────┘    │
-│  ┌──────────────┐  ┌──────────────┐    │
-│  │ Speech Rec   │  │ OCR          │    │
-│  │ ● Running    │  │ ● Running    │    │
-│  └──────────────┘  └──────────────┘    │
-│  ┌──────────────────────────────┐      │
-│  │ Workflow Engine              │      │
-│  │ ● Running                    │      │
-│  └──────────────────────────────┘      │
-│                                         │
-│  [Challenge Me]                          │
-│                                         │
-├─────────────────────────────────────────┤
-│  Timeline preview                       │
-│  (progress bary)                        │
-│                                         │
-│  [View full timeline →]                 │
-│                                         │
-├─────────────────────────────────────────┤
-│  Footer                                 │
-└─────────────────────────────────────────┘
-```
-
-### Výhody
-- Unikátní hero (terminál) + konzistentní design (bento)
-- Nejlepší z obou světů
-- Technický vibe + Apple elegance
-- Dobře škálovatelné
-
-### Nevýhody
-- Víc práce než single page
-- Dva designové jazyky na jedné stránce (riziko nekonzistence)
-
----
-
-## Srovnání variant
-
-| Kritérium | A (Dashboard) | B (Terminal) | C (Bento) | D (Hybrid) |
-|-----------|:---:|:---:|:---:|:---:|
-| **Rychlost vývoje** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| **Unikátnost** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Konzistence s .cz** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Technický vibe** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Přístupnost** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Škálovatelnost** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Wow efekt** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Celkem** | **24/35** | **26/35** | **24/35** | **28/35** |
-
----
-
-## Moje doporučení
-
-### Varianta D (Hybrid) — nejlepší poměr unikátnost + konzistence
-
-Terminál hero pro technický vibe, bento grid pro live status (konzistentní s .cz), timeline pro aktivitu, challenge pro wow efekt.
-
-### Alternativa: Varianta B (Terminal) — pokud chceš něco fakt jiného
-
-Rychlejší na vývoj, unikátnější, ale míň konzistentní s .cz.
-
-### Co bych dělal já
-
-Začal bych **Varianta D** — terminál hero + bento live status + timeline + challenge. 3 stránky (/, /timeline, /challenge). ~3 hodiny práce.
-
----
-
-## Odhad času (Varianta D)
-
-| Úkol | Čas |
-|------|-----|
-| Inicializace Next.js + kopie design systému | 15 min |
-| Layout + metadata + Nav | 15 min |
-| Terminál hero sekce | 20 min |
-| Bento live status grid | 25 min |
-| Timeline stránka | 30 min |
-| Challenge Me stránka + API | 45 min |
-| API status endpoint | 15 min |
-| Deploy na Vercel | 10 min |
-| **Celkem** | **~3 hodiny** |
+1. **Live Status API** — `/api/status` pro reálné health-checky (největší wow efekt za nejmíň práce).
+2. **Reálné endpointy** — Image Gen + Speech Rec + OCR.
+3. **Terminál hero** — dokončit Variantu D.
+4. **Timeline stránka** — dynamická, napojená na GitHub API.
+5. **Active Agents feed** — logy z OpenClaw agentů jako "důkaz práce".
