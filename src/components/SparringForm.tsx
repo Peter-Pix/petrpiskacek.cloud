@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SparklesIcon, ArrowRightIcon, RefreshIcon } from "./icons";
+import { trackEvent } from "@/lib/track";
 import type { Block, BlockKind, BlockWithMeta, ClarifyQuestion } from "@/lib/sparring-types";
 
 const DAILY_LIMIT = 5;
@@ -585,6 +586,9 @@ export default function SparringForm() {
               </p>
               <a
                 href={buildMailtoUrl()}
+                onClick={() =>
+                  trackEvent("click_cta", { cta: "challenge_email", location: "challenge_done" })
+                }
                 className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all"
                 style={{
                   backgroundColor: "var(--gold)",

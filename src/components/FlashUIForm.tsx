@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { SparklesIcon, RefreshIcon, CheckIcon, ExternalLinkIcon } from "./icons";
+import { trackEvent } from "@/lib/track";
 
 const RANDOM_PROMPTS = [
   "Premium dashboard s metrikama, sparklines a gold akcentem",
@@ -514,6 +515,24 @@ ${rawHtml}
                 </div>
               </div>
             )}
+
+            {/* Konverzní CTA po vygenerování */}
+            <div className="mt-8 flex flex-col items-center gap-3 text-center animate-fade-in">
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+                Líbí se ti výsledek? Potřebuješ UI na míru?
+              </p>
+              <a
+                href="mailto:info@petrpiskacek.cz?subject=Flash%20UI"
+                onClick={() =>
+                  trackEvent("click_cta", { cta: "flash_ui", location: "flash_result" })
+                }
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all"
+                style={{ backgroundColor: "var(--gold)", color: "var(--text-inverse)" }}
+              >
+                <ExternalLinkIcon size={14} />
+                Napiš mi
+              </a>
+            </div>
 
           </div>
         )}
