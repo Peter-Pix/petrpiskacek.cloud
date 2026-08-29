@@ -289,7 +289,7 @@ export default function SparringForm() {
     lines.push("---", "", "Vygenerováno živě pomocí Petr's AI stacku.");
 
     const body = lines.join("\n");
-    return `mailto:ppix50@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return `mailto:info@petrpiskacek.cz?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   return (
