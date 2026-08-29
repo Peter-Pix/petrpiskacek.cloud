@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import TrackedCta from "@/components/TrackedCta";
 import RoiCalculator from "@/components/RoiCalculator";
+import JsonLd from "@/components/JsonLd";
 import { Footer } from "@piskacek/ui";
 
 export const metadata = {
@@ -12,6 +13,7 @@ export default function AiWorkerPage() {
   return (
     <main className="relative">
       <Nav />
+      <JsonLd type="service" />
 
       {/* HERO */}
       <section className="section-apple">
