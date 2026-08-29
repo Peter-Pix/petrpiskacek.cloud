@@ -269,7 +269,14 @@ ${rawHtml}
         setHtml(accumulated);
       }
 
-      setHasResult(true);
+      // Prázdný stream = AI nevrátila žádný HTML (např. model odpověděl
+      // textem místo kódu). Chybí viditelná chyba místo tichého failu.
+      if (!accumulated.trim()) {
+        setError("AI nevrátila žádný kód. Zkus jiný nebo konkrétnější prompt.");
+        setHtml("");
+      } else {
+        setHasResult(true);
+      }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Něco se pokazilo");

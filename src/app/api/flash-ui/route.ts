@@ -140,7 +140,24 @@ export async function POST(req: NextRequest) {
       async start(controller) {
         const decoder = new TextDecoder();
         let buffer = "";
-        let hasStartedHtml = false;
+        let sentAnything = false;
+
+        // Odstraní zbývající markdown code-fences z okrajů kódu.
+        const stripFences = (s: string) => {
+          return s
+            .replace(/^[\s]*```[a-zA-Z]*[\n]?/, "") // opening fence
+            .replace(/```[\s]*$/, "") // closing fence
+            .replace(/^[\s]*`+/, "") // stray backticks at start
+            .replace(/`+[\s]*$/, ""); // stray backticks at end
+        };
+
+        const flush = (content: string) => {
+          if (!content) return;
+          content = stripFences(content);
+          if (!content) return;
+          sentAnything = true;
+          controller.enqueue(encoder.encode(content));
+        };
 
         try {
           while (true) {
@@ -156,20 +173,7 @@ export async function POST(req: NextRequest) {
               if (!line.trim()) continue;
               try {
                 const parsed = JSON.parse(line);
-                const content = parsed?.message?.content || "";
-                if (content) {
-                  if (!hasStartedHtml) {
-                    const htmlStartIndex = content.indexOf("<html");
-                    const doctypeIndex = content.indexOf("<!DOCTYPE");
-                    const startPos = Math.max(doctypeIndex, htmlStartIndex);
-                    if (startPos !== -1) {
-                      hasStartedHtml = true;
-                      controller.enqueue(encoder.encode(content.slice(startPos)));
-                    }
-                  } else {
-                    controller.enqueue(encoder.encode(content));
-                  }
-                }
+                flush(parsed?.message?.content || "");
               } catch {
                 // skip
               }
@@ -179,19 +183,7 @@ export async function POST(req: NextRequest) {
           if (buffer.trim()) {
             try {
               const parsed = JSON.parse(buffer);
-              const content = parsed?.message?.content || "";
-              if (content) {
-                if (!hasStartedHtml) {
-                  const htmlStartIndex = content.indexOf("<html");
-                  const doctypeIndex = content.indexOf("<!DOCTYPE");
-                  const startPos = Math.max(doctypeIndex, htmlStartIndex);
-                  if (startPos !== -1) {
-                    controller.enqueue(encoder.encode(content.slice(startPos)));
-                  }
-                } else {
-                  controller.enqueue(encoder.encode(content));
-                }
-              }
+              flush(parsed?.message?.content || "");
             } catch {
               // skip
             }
@@ -199,6 +191,8 @@ export async function POST(req: NextRequest) {
         } catch (err) {
           console.error("Stream error:", err);
         } finally {
+          // Fallback: pokud model nic neodeslal (např. fragment bez <html>),
+          // pošleme cokoliv máme, aby klient nezůstal viset na prázdném streamu.
           controller.close();
           reader.releaseLock();
         }
