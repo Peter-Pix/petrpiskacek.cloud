@@ -189,7 +189,10 @@ function AppLink({
         target="_blank"
         rel="noopener noreferrer"
         className={className}
-        onClick={() => trackEvent("click_app", { app: appId, name: appName })}
+        onClick={() => {
+        trackEvent("click_app", { app: appId, name: appName });
+        trackEvent("click_cta", { cta: "app_" + appId, app: appName, location: "home_grid" });
+      }}
       >
         <span>{label}</span>
         {arrow}
@@ -201,7 +204,10 @@ function AppLink({
     <Link
       href={href}
       className={className}
-      onClick={() => trackEvent("click_app", { app: appId, name: appName })}
+      onClick={() => {
+        trackEvent("click_app", { app: appId, name: appName });
+        trackEvent("click_cta", { cta: "app_" + appId, app: appName, location: "home_grid" });
+      }}
     >
       <span>{label}</span>
       {arrow}
