@@ -27,32 +27,32 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number; rese
 }
 
 const SYSTEM_PROMPT = [
-  "Jsi expertní UI/UX kodér. Na základě požadavku klienta vytvoříš jeden kompletní, izolovaný HTML dokument.",
+  "Jsi expertní frontend kodér. Na základě zadání klienta vytvoříš jeden kompletní, izolovaný HTML dokument, který lze okamžitě zobrazit v prohlížeči.",
   "",
-  "Absolutní pravidla (NEPORUŠUJ):",
-  "- Výstup začíná PŘESNĚ na '<!DOCTYPE html>' a končí PŘESNĚ na '</html>'.",
-  "- Před '<!DOCTYPE html>' ani za '</html>' NESMÍ být žádný text, vysvětlení, poznámka ani prázdné řádky.",
-  "- NEPOUŽÍVEJ markdown code-fence (```html ... ```). Vracím pouze čistý HTML.",
-  "- Vracím POUZE HTML kód - žádné komentáře typu 'Tady je...', 'Here's a...', 'Vytvořil jsem...'.",
+  "NEJVYŠŠÍ PRAVIDLA — pokud je porušíš, výstup bude odmítnut:",
+  "- Výstup MUSÍ začínat PŘESNĚ na '<!DOCTYPE html>' a končit PŘESNĚ na '</html>'.",
+  "- Před '<!DOCTYPE html>' ani za '</html>' NESMÍ být JEDINÝ znak textu, vysvětlení, poznámka, prázdný řádek ani markdown fence.",
+  "- NEPOUŽÍVEJ ```html ani ```. Vracím pouze čistý HTML bez obalu.",
+  "- NIKDY nepiš věty jako 'Tady je...', 'Here's...', 'Vytvořil jsem...', 'Omlouváme se...' — jen kód.",
   "",
   "Technická pravidla:",
-  "- Pouzivam inline CSS nebo <style> tag v <head>.",
-  "- Pouzivam moderni CSS (flexbox, grid, custom properties).",
-  "- Design: tmavy rezim (background #0a0a0a, text #e5e5e5), akcent #c8962e (zlata).",
-  "- Responzivni design (mobile-first).",
-  "- Zadny externi zavislosti (zadny CDN, zadny frameworky).",
-  "- Pokud uzivatel zada jen 'tlacitko' nebo 'formular', vytvorim celou stranku s tim prvkem.",
-  "- Pisu cesky popisky v UI (tlacitka, labely, placeholder texty).",
-  "- NEPRIDAVAM navigaci, menu, footer, copyright, ani odkazy na jine stranky. Jen to, co uzivatel zadal.",
-  "- NEPOUZIVAM iframe, object, embed, ani jine vnorene dokumenty.",
-  "- Neprebiram obsah z okolni stranky. Delam samostatny, izolovany navrh.",
-  "- Pokud navrh obsahuje vice stranek/sekci (napr. prezentace, carousel, taby), pridam JS pro prepinani (sipky, klik, keyboard events).",
-  "- Animace delam plynule a pomale (transition: 0.4s-0.6s ease, ne 0.2s). Zadne trhane nebo prilis rychle animace.",
-  "- Pouzivam bezpecne CSS animace: opacity, transform (translate, scale), background-color. Vyhybam se animacim width/height/top/left, ktere zpusobuji layout shifting.",
-  "- Pokud pouzivam @keyframes, nastavuji animation-duration na 0.5s-1s, ne rychleji.",
-  "- Veskery JS pisu primo do HTML (internal <script> tag), zadne externi soubory.",
+  "- Všechny styly píšu do <style> v <head> nebo inline. ŽÁDNÉ externí CSS soubory, žádné <link rel=stylesheet>.",
+  "- ŽÁDNÉ externí závislosti: žádné CDN, žádné Google Fonts, žádné ikonické fonty, žádné frameworky, žádné skripty z jiných serverů.",
+  "- Font-family: pouze system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif, serif, monospace.",
+  "- Design: tmavý režim (background #0a0a0a, text #e5e5e5), akcent #c8962e (zlata).",
+  "- Responzivní design (mobile-first), moderní CSS (flexbox, grid, custom properties).",
+  "- Pokud uživatel zadá jen 'tlačítko' nebo 'formulář', vytvořím celou stránku s tím prvkem.",
+  "- Píšu české popisky v UI (tlačítka, labely, placeholder texty).",
+  "- NEPŘIDÁVÁM navigaci, menu, footer, copyright, ani odkazy na jiné stránky. Jen to, co uživatel zadal.",
+  "- NEPOUŽÍVÁM iframe, object, embed, ani jiné vnořené dokumenty.",
+  "- Nepřebírám obsah z okolní stránky. Dělám samostatný, izolovaný návrh.",
+  "- Pokud návrh obsahuje více stránek/sekcí (např. prezentace, carousel, taby), přidám JS pro přepínání (šipky, klik, keyboard events).",
+  "- Animace dělám plynulé a pomalé (transition: 0.4s-0.6s ease, ne 0.2s). Žádné trhané nebo příliš rychlé animace.",
+  "- Používám bezpečné CSS animace: opacity, transform (translate, scale), background-color. Vyhýbám se animacím width/height/top/left, které způsobují layout shifting.",
+  "- Pokud používám @keyframes, nastavuji animation-duration na 0.5s-1s, ne rychleji.",
+  "- Veškerý JS píšu přímo do HTML (internal <script> tag), žádné externí soubory.",
   "",
-  "Priklad vystupu:",
+  "Příklad správného výstupu:",
   "<!DOCTYPE html>",
   '<html lang="cs">',
   "<head>",
@@ -71,25 +71,72 @@ const SYSTEM_PROMPT = [
 
 // Extract complete HTML document from any raw text.
 function extractHtml(raw: string): string {
-  const cleaned = raw
-    .replace(/^\s*```[a-zA-Z]*\n?/im, "")
+  if (!raw || typeof raw !== "string") return "";
+
+  // Strip markdown code fences (including language tag and any surrounding fences).
+  let cleaned = raw
+    .replace(/^\s*```[a-zA-Z0-9_+-]*\n?/im, "")
     .replace(/\n?```\s*$/im, "")
-    .replace(/^\s*`+/, "")
-    .replace(/`+\s*$/, "")
     .trim();
 
-  const start = cleaned.search(/<!DOCTYPE\s+html/i);
-  if (start === -1) {
-    const htmlStart = cleaned.search(/<html/i);
-    if (htmlStart === -1) return "";
-    return cleaned.slice(htmlStart);
+  // If after stripping fences there are still stray leading/trailing backticks, remove them.
+  cleaned = cleaned.replace(/^\s*`+/, "").replace(/`+\s*$/, "").trim();
+
+  // Find DOCTYPE start (case-insensitive, allow leading whitespace).
+  let start = cleaned.search(/<!DOCTYPE\s+html\b/i);
+  if (start !== -1) {
+    const before = cleaned.slice(0, start).trim();
+    if (before) {
+      console.warn("Discarded text before DOCTYPE:", before.slice(0, 200));
+    }
   }
 
-  let end = cleaned.search(/<\/html\s*>/i);
-  if (end === -1) end = cleaned.length;
-  else end += cleaned.slice(end).match(/<\/html\s*>/i)![0].length;
+  // Fallback: find <html tag.
+  if (start === -1) {
+    start = cleaned.search(/<html\b/i);
+  }
 
-  return cleaned.slice(start, end);
+  // Last resort: if raw contains any <body or common HTML element, treat as fragment.
+  if (start === -1) {
+    const fragmentStart = cleaned.search(/<(?:body|div|section|nav|button|form|input|header|main|article|ul|ol|table|canvas|svg)/i);
+    if (fragmentStart !== -1) {
+      console.warn("Model returned HTML fragment; wrapping in template.");
+      const fragment = cleaned.slice(fragmentStart);
+      return wrapFragment(fragment);
+    }
+    return "";
+  }
+
+  // Find end of </html>.
+  let end = cleaned.search(/<\/html\s*>/i);
+  if (end === -1) {
+    end = cleaned.length;
+  } else {
+    const match = cleaned.slice(end).match(/<\/html\s*>/i);
+    end += match ? match[0].length : 7;
+  }
+
+  return cleaned.slice(start, end).trim();
+}
+
+// Wrap a bare HTML fragment in a complete document shell.
+function wrapFragment(fragment: string): string {
+  return [
+    "<!DOCTYPE html>",
+    '<html lang="cs">',
+    "<head>",
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    "<style>",
+    "  * { margin: 0; padding: 0; box-sizing: border-box; }",
+    "  body { background: #0a0a0a; color: #e5e5e5; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }",
+    "</style>",
+    "</head>",
+    "<body>",
+    fragment,
+    "</body>",
+    "</html>",
+  ].join("\n");
 }
 
 export async function POST(req: NextRequest) {
