@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Ollama } from "ollama";
 import { MODELS, OPENROUTER_URL } from "@/lib/models";
+import { chatCompletion } from "@/lib/ollama";
 
-const OLLAMA_MODEL = MODELS.sparring;
 const OPENROUTER_MODEL = "google/gemini-2.5-flash";
 const DAILY_LIMIT = 5;
 
@@ -90,11 +89,9 @@ function validateBlock(data: unknown, blockKind: string): boolean {
 }
 
 function safeParseJSON(text: string): unknown {
-  // Zkus parsovat rovnou
   try {
     return JSON.parse(text);
   } catch {
-    // Zkus najít JSON v textu (model občas přidá markdown nebo text)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       try {
@@ -108,23 +105,19 @@ function safeParseJSON(text: string): unknown {
 }
 
 async function callOllama(prompt: string, answers: Record<string, string>, blockKind: string): Promise<unknown> {
-  const ollama = new Ollama({
-    host: 'https://ollama.com',
-    headers: { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` },
-  });
-
   const systemPrompt = buildSystemPrompt(blockKind, prompt, answers);
 
-  const response = await ollama.generate({
-    model: OLLAMA_MODEL,
-    prompt: systemPrompt,
-    stream: false,
-    format: 'json',
+  const { content } = await chatCompletion({
+    model: MODELS.sparring,
+    messages: [{ role: "system", content: systemPrompt }],
+    temperature: 0.5,
+    max_tokens: 400,
+    response_format: { type: "json_object" },
   });
 
-  const parsed = safeParseJSON(response.response);
+  const parsed = safeParseJSON(content);
   if (!parsed) {
-    throw new Error(`Ollama nevrátila validní JSON: ${response.response.slice(0, 200)}`);
+    throw new Error(`Ollama nevrátila validní JSON: ${content.slice(0, 200)}`);
   }
 
   if (!validateBlock(parsed, blockKind)) {
@@ -148,9 +141,7 @@ async function callOpenRouter(prompt: string, answers: Record<string, string>, b
     },
     body: JSON.stringify({
       model: OPENROUTER_MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-      ],
+      messages: [{ role: "system", content: systemPrompt }],
       response_format: { type: "json_object" },
     }),
   });
@@ -178,7 +169,6 @@ async function callOpenRouter(prompt: string, answers: Record<string, string>, b
 
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting
     const ip = getClientIP(req);
     const limit = checkRateLimit(ip);
 

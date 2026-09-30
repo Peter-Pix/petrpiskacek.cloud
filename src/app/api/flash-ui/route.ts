@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MODELS } from "@/lib/models";
+import { chatCompletion } from "@/lib/ollama";
 
-const OLLAMA_URL = "https://ollama.com/api/chat";
 const DAILY_LIMIT = 5;
 
 const ipUsage = new Map<string, { count: number; date: string }>();
@@ -33,7 +33,8 @@ const SYSTEM_PROMPT = [
   "- Výstup MUSÍ začínat PŘESNĚ na '<!DOCTYPE html>' a končit PŘESNĚ na '</html>'.",
   "- Před '<!DOCTYPE html>' ani za '</html>' NESMÍ být JEDINÝ znak textu, vysvětlení, poznámka, prázdný řádek ani markdown fence.",
   "- NEPOUŽÍVEJ ```html ani ```. Vracím pouze čistý HTML bez obalu.",
-  "- NIKDY nepiš věty jako 'Tady je...', 'Here's...', 'Vytvořil jsem...', 'Omlouváme se...' — jen kód.",
+  "- NIKDY nepiš věty jako 'Tady je...', 'Here's...', 'Vytvořil jsem...', 'Omlouváme se...', '### Design Highlights' — jen kód.",
+  "- Za uzavíracím </html> nesmí být ŽÁDNÝ další text, komentář, ani sekce s vysvětlením.",
   "",
   "Technická pravidla:",
   "- Všechny styly píšu do <style> v <head> nebo inline. ŽÁDNÉ externí CSS soubory, žádné <link rel=stylesheet>.",
@@ -73,16 +74,16 @@ const SYSTEM_PROMPT = [
 function extractHtml(raw: string): string {
   if (!raw || typeof raw !== "string") return "";
 
-  // Strip markdown code fences (including language tag and any surrounding fences).
+  // Remove markdown code fences including embedded language tag and possible trailing fences.
   let cleaned = raw
-    .replace(/^\s*```[a-zA-Z0-9_+-]*\n?/im, "")
-    .replace(/\n?```\s*$/im, "")
+    .replace(/^\s*```[a-zA-Z0-9_+-]*\n?/gim, "")
+    .replace(/\n?```\s*$/gim, "")
     .trim();
 
-  // If after stripping fences there are still stray leading/trailing backticks, remove them.
-  cleaned = cleaned.replace(/^\s*`+/, "").replace(/`+\s*$/, "").trim();
+  // Also strip any remaining fence markers that may appear after content.
+  cleaned = cleaned.replace(/^\s*```/g, "").replace(/```\s*$/g, "").trim();
 
-  // Find DOCTYPE start (case-insensitive, allow leading whitespace).
+  // Find DOCTYPE start (case-insensitive).
   let start = cleaned.search(/<!DOCTYPE\s+html\b/i);
   if (start !== -1) {
     const before = cleaned.slice(0, start).trim();
@@ -96,7 +97,7 @@ function extractHtml(raw: string): string {
     start = cleaned.search(/<html\b/i);
   }
 
-  // Last resort: if raw contains any <body or common HTML element, treat as fragment.
+  // Last resort: if raw contains any common HTML element, treat as fragment.
   if (start === -1) {
     const fragmentStart = cleaned.search(/<(?:body|div|section|nav|button|form|input|header|main|article|ul|ol|table|canvas|svg)/i);
     if (fragmentStart !== -1) {
@@ -116,7 +117,16 @@ function extractHtml(raw: string): string {
     end += match ? match[0].length : 7;
   }
 
-  return cleaned.slice(start, end).trim();
+  const extracted = cleaned.slice(start, end).trim();
+
+  // Remove anything that follows after closing </html> (extra explanations).
+  const closingMatch = extracted.match(/<\/html\s*>([\s\S]*)$/i);
+  if (closingMatch && closingMatch[1].trim()) {
+    console.warn("Discarded trailing text after </html>:", closingMatch[1].slice(0, 200));
+    return extracted.slice(0, extracted.indexOf(closingMatch[0]) + closingMatch[0].indexOf("</html>") + "</html>".length).trim();
+  }
+
+  return extracted;
 }
 
 // Wrap a bare HTML fragment in a complete document shell.
@@ -175,37 +185,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Služba je dočasně nedostupná." }, { status: 500 });
     }
 
-    const response = await fetch(OLLAMA_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODELS.flashUI,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: prompt },
-        ],
-        stream: false,
-        options: {
-          temperature: 0.3,
-          num_predict: 4096,
-        },
-      }),
+    const { content: rawOutput } = await chatCompletion({
+      model: MODELS.flashUI,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.3,
+      max_tokens: 4096,
     });
 
-    if (!response.ok) {
-      const text = await response.text().catch(() => "");
-      console.error("Ollama error:", response.status, text.slice(0, 300));
-      return NextResponse.json(
-        { error: "Omlouváme se — náš AI návrhář má právě plné ruce práce. Zkus to za chvilku, jak se fronta trochu uvolní." },
-        { status: 502 }
-      );
-    }
-
-    const data = await response.json();
-    const rawOutput = data?.message?.content || "";
     const html = extractHtml(rawOutput);
 
     if (!html) {

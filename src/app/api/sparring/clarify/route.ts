@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Ollama } from "ollama";
 import { MODELS, OPENROUTER_URL } from "@/lib/models";
+import { chatCompletion } from "@/lib/ollama";
 
-const OLLAMA_MODEL = MODELS.sparring;
 const OPENROUTER_MODEL = "google/gemini-2.5-flash";
 
 const SYSTEM_PROMPT = `Jsi Sparring — AI architekt, co s tebou přemýšlí o projektu.
@@ -59,27 +58,25 @@ function validateQuestions(parsed: { questions?: Array<{ id?: string; text?: str
 }
 
 async function callOllama(prompt: string): Promise<Question[]> {
-  const ollama = new Ollama({
-    host: 'https://ollama.com',
-    headers: { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` },
+  const { content } = await chatCompletion({
+    model: MODELS.sparring,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.6,
+    max_tokens: 200,
+    response_format: { type: "json_object" },
   });
 
-  const response = await ollama.generate({
-    model: OLLAMA_MODEL,
-    prompt: `${SYSTEM_PROMPT}\n\nZadání: ${prompt}`,
-    stream: false,
-    format: 'json',
-    options: { temperature: 0.6 },
-  });
-
-  const parsed = safeParseJSON(response.response);
+  const parsed = safeParseJSON(content);
   if (!parsed) {
-    throw new Error(`Ollama nevrátila validní JSON: ${response.response.slice(0, 200)}`);
+    throw new Error(`Ollama nevrátila validní JSON: ${content.slice(0, 200)}`);
   }
 
   const questions = validateQuestions(parsed);
   if (questions.length === 0) {
-    throw new Error(`Ollama nevrátila žádné validní otázky: ${response.response.slice(0, 200)}`);
+    throw new Error(`Ollama nevrátila žádné validní otázky: ${content.slice(0, 200)}`);
   }
 
   return questions;
