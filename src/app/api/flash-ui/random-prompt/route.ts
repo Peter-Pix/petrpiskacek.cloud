@@ -16,21 +16,24 @@ export async function POST() {
 
     const response = await ollama.generate({
       model: MODELS.randomPrompt,
-      prompt: `Jsi kreativní UI/UX designer. Vygeneruj jeden unikátní, krátký a konkrétní požadavek na UI komponentu nebo malou webovou stránku v češtině.
-SOUBORY A KONTEXT: Aktuální čas ${timestamp}, náhodný kód ${randomSeed}. Použij tyto hodnoty k zajištění maximální variability odpovědi.
+      prompt: `Jsi kreativní UI/UX designer pro české klienty. Vygeneruj jeden konkrétní, krátký požadavek na UI komponentu nebo malou webovou stránku v češtině.
+
+Kontext pro tebe (NEUVÁDĚJ v odpovědi): čas ${timestamp}, seed ${randomSeed}.
 
 Kritéria:
-- Piš z pohledu klienta, který neví nic o kódu, ale ví, co chce (např. "Potřebuji moderní ceníkovou tabulku pro tři tarify...").
-- ABSOLUTNĚ nepoužívej slova "AI", "chatbot", "asistent". Popisuj pouze vizuální a funkční potřebu.
+- Piš z pohledu klienta, který neumí kódovat, ale ví, co chce vizuálně a funkčně.
+- ABSOLUTNĚ nepoužívej slova "AI", "chatbot", "asistent".
+- NEUVÁDĚJ žádné technické detaily, časové značky, náhodné kódy, hashe ani metadata.
+- NEUVÁDĚJ konkrétní hodnoty jako "čas 17:41" nebo "odznak 4a8d7" — to jsou interní data, ne obsah UI.
 - Délka: max 160 znaků.
-- Obsah: Různé typy (dashboardy, landing pages, kalkulačky, formuláře, interaktivní grafy, profily).
-- Formát: Jen čistý text promptu, bez úvodů, uvozek, teček na konci nebo vysvětlení.
-- ZAKÁZÁNO: Opakovat se.
+- Formát: jen čistý text promptu, bez uvozovek, bez tečky na konci, bez úvodu nebo vysvětlení.
+- Obsah: různé typy (dashboardy, landing pages, kalkulačky, formuláře, interaktivní grafy, profily, timeline, ceníky, karusely).
+- ZAKÁZÁNO: opakovat se, generovat abstraktní pojmy, používat cizí slova bez potřeby.
 
 Příklady stylu:
-- "Potřebuji elegantní přihlašovací stránku s možností přihlášení přes Google a Apple."
-- "Hledám moderní dashboard pro sledování prodejů s velkými čísly a barevnými grafy."
-- "Chci interaktivní kalkulačku hypotéky s posuvníky pro úrokovou sazbu a dobu splátky."`,
+- "Potřebuji elegantní přihlašovací stránku s možností přihlášení přes Google a Apple"
+- "Hledám moderní dashboard pro sledování prodejů s velkými čísly a barevnými grafy"
+- "Chci interaktivní kalkulačku hypotéky s posuvníky pro úrokovou sazbu a dobu splátky"`,
       stream: false,
       options: {
         temperature: 0.9,
