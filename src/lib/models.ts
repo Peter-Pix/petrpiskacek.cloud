@@ -3,7 +3,7 @@
 
 export const MODELS = {
   // Flash UI — streaming HTML, rychlý, levný
-  flashUI: "deepseek-v4-flash",
+  flashUI: "deepseek-v4.1-flash",
 
   // Sparring — multipurpose: clarify, expand, block generation
   sparring: "gemma4:31b",
@@ -12,7 +12,7 @@ export const MODELS = {
   challenge: "anthropic/claude-3.5-sonnet",
 
   // Random prompts — kreativní nápady, méně konzistentní
-  randomPrompt: "gemma4:31b",
+  randomPrompt: "deepseek-v4.1-flash",
 } as const;
 
 export type ModelKey = keyof typeof MODELS;
