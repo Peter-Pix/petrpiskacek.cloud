@@ -27,18 +27,22 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number; rese
 }
 
 const SYSTEM_PROMPT = [
-  "Pomaham s navrhem HTML kodu. Delam cisty, funkcni HTML na zaklade zadani.",
+  "Jsi expertní UI/UX kodér. Na základě požadavku klienta vytvoříš jeden kompletní, izolovaný HTML dokument.",
   "",
-  "Pravidla:",
-  "- Vracim POUZE HTML kod - zadne vysvetlivky, zadny komentar pred/po kodu",
-  "- Pouzivam inline CSS nebo <style> tag v <head>",
-  "- Pouzivam moderni CSS (flexbox, grid, custom properties)",
-  "- Design: tmavy rezim (background #0a0a0a, text #e5e5e5), akcent #c8962e (zlata)",
-  "- Responzivni design (mobile-first)",
-  "- Zadny externi zavislosti (zadny CDN, zadny frameworky)",
-  "- Vystup musi byt kompletni HTML dokument (<!DOCTYPE html> az </html>)",
-  "- Pokud uzivatel zada jen 'tlacitko' nebo 'formular', vytvorim celou stranku s tim prvkem",
-  "- Pisu cesky popisky v UI (tlacitka, labely, placeholder texty)",
+  "Absolutní pravidla (NEPORUŠUJ):",
+  "- Výstup začíná PŘESNĚ na '<!DOCTYPE html>' a končí PŘESNĚ na '</html>'.",
+  "- Před '<!DOCTYPE html>' ani za '</html>' NESMÍ být žádný text, vysvětlení, poznámka ani prázdné řádky.",
+  "- NEPOUŽÍVEJ markdown code-fence (```html ... ```). Vracím pouze čistý HTML.",
+  "- Vracím POUZE HTML kód - žádné komentáře typu 'Tady je...', 'Here's a...', 'Vytvořil jsem...'.",
+  "",
+  "Technická pravidla:",
+  "- Pouzivam inline CSS nebo <style> tag v <head>.",
+  "- Pouzivam moderni CSS (flexbox, grid, custom properties).",
+  "- Design: tmavy rezim (background #0a0a0a, text #e5e5e5), akcent #c8962e (zlata).",
+  "- Responzivni design (mobile-first).",
+  "- Zadny externi zavislosti (zadny CDN, zadny frameworky).",
+  "- Pokud uzivatel zada jen 'tlacitko' nebo 'formular', vytvorim celou stranku s tim prvkem.",
+  "- Pisu cesky popisky v UI (tlacitka, labely, placeholder texty).",
   "- NEPRIDAVAM navigaci, menu, footer, copyright, ani odkazy na jine stranky. Jen to, co uzivatel zadal.",
   "- NEPOUZIVAM iframe, object, embed, ani jine vnorene dokumenty.",
   "- Neprebiram obsah z okolni stranky. Delam samostatny, izolovany navrh.",
@@ -64,6 +68,29 @@ const SYSTEM_PROMPT = [
   "</body>",
   "</html>",
 ].join("\n");
+
+// Extract complete HTML document from any raw text.
+function extractHtml(raw: string): string {
+  const cleaned = raw
+    .replace(/^\s*```[a-zA-Z]*\n?/im, "")
+    .replace(/\n?```\s*$/im, "")
+    .replace(/^\s*`+/, "")
+    .replace(/`+\s*$/, "")
+    .trim();
+
+  const start = cleaned.search(/<!DOCTYPE\s+html/i);
+  if (start === -1) {
+    const htmlStart = cleaned.search(/<html/i);
+    if (htmlStart === -1) return "";
+    return cleaned.slice(htmlStart);
+  }
+
+  let end = cleaned.search(/<\/html\s*>/i);
+  if (end === -1) end = cleaned.length;
+  else end += cleaned.slice(end).match(/<\/html\s*>/i)![0].length;
+
+  return cleaned.slice(start, end);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -113,7 +140,7 @@ export async function POST(req: NextRequest) {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: prompt },
         ],
-        stream: true,
+        stream: false,
         options: {
           temperature: 0.3,
           num_predict: 4096,
@@ -130,76 +157,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const reader = response.body?.getReader();
-    if (!reader) {
-      return NextResponse.json({ error: "No response stream." }, { status: 502 });
+    const data = await response.json();
+    const rawOutput = data?.message?.content || "";
+    const html = extractHtml(rawOutput);
+
+    if (!html) {
+      console.error("No HTML extracted. Raw preview:", rawOutput.slice(0, 500));
+      return NextResponse.json(
+        { error: "AI nevrátila platný HTML kód. Zkus jiný nebo konkrétnější prompt." },
+        { status: 502 }
+      );
     }
 
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let sentAnything = false;
-
-        // Odstraní zbývající markdown code-fences z okrajů kódu.
-        const stripFences = (s: string) => {
-          return s
-            .replace(/^[\s]*```[a-zA-Z]*[\n]?/, "") // opening fence
-            .replace(/```[\s]*$/, "") // closing fence
-            .replace(/^[\s]*`+/, "") // stray backticks at start
-            .replace(/`+[\s]*$/, ""); // stray backticks at end
-        };
-
-        const flush = (content: string) => {
-          if (!content) return;
-          content = stripFences(content);
-          if (!content) return;
-          sentAnything = true;
-          controller.enqueue(encoder.encode(content));
-        };
-
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-              if (!line.trim()) continue;
-              try {
-                const parsed = JSON.parse(line);
-                flush(parsed?.message?.content || "");
-              } catch {
-                // skip
-              }
-            }
-          }
-
-          if (buffer.trim()) {
-            try {
-              const parsed = JSON.parse(buffer);
-              flush(parsed?.message?.content || "");
-            } catch {
-              // skip
-            }
-          }
-        } catch (err) {
-          console.error("Stream error:", err);
-        } finally {
-          // Fallback: pokud model nic neodeslal (např. fragment bez <html>),
-          // pošleme cokoliv máme, aby klient nezůstal viset na prázdném streamu.
-          controller.close();
-          reader.releaseLock();
-        }
-      },
-    });
-
-    return new Response(stream, {
+    return new Response(html, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-cache",

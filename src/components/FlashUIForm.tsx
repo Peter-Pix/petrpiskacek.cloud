@@ -83,9 +83,8 @@ function RotatingPlaceholder({ isActive }: { isActive: boolean }) {
 }
 
 // Loading state
-function LoadingState({ html }: { html: string }) {
-  const chars = html.length;
-  const lines = html.split('\n').length;
+function LoadingState({ progress }: { progress: number }) {
+  const pct = Math.min(progress, 100);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-20">
@@ -99,10 +98,10 @@ function LoadingState({ html }: { html: string }) {
       </div>
       <div className="text-center space-y-2">
         <p className="text-sm animate-pulse" style={{ color: 'var(--gold)' }}>
-          Přemýšlím...
+          {pct > 0 ? `Přemýšlím… ${pct}%` : 'Přemýšlím…'}
         </p>
         <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-          {chars > 0 ? `${chars} znaků · ${lines} řádků` : 'Připravuji návrh...'}
+          AI kreslí HTML
         </p>
       </div>
       <div className="w-48 h-1 rounded-full overflow-hidden"
@@ -111,7 +110,7 @@ function LoadingState({ html }: { html: string }) {
         <div
           className="h-full rounded-full transition-all duration-300 animate-progress-shimmer"
           style={{
-            width: `${Math.min((chars / 2000) * 100, 95)}%`,
+            width: `${pct}%`,
             background: 'linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold))',
             backgroundSize: '200% 100%',
           }}
@@ -147,6 +146,7 @@ export default function FlashUIForm() {
   const [prompt, setPrompt] = useState("");
   const [html, setHtml] = useState("");
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [randomizing, setRandomizing] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -235,6 +235,15 @@ ${rawHtml}
     const controller = new AbortController();
     abortRef.current = controller;
 
+    // Simulate progress while waiting for the model (non-streaming).
+    setProgress(0);
+    const progressInterval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 90) return p;
+        return p + Math.max(2, Math.floor((90 - p) / 6));
+      });
+    }, 400);
+
     try {
       const res = await fetch("/api/flash-ui", {
         method: "POST",
@@ -242,6 +251,9 @@ ${rawHtml}
         body: JSON.stringify({ prompt: prompt.trim() }),
         signal: controller.signal,
       });
+
+      clearInterval(progressInterval);
+      setProgress(100);
 
       const remaining = res.headers.get("X-RateLimit-Remaining");
       if (remaining) setLimitRemaining(parseInt(remaining));
@@ -252,37 +264,28 @@ ${rawHtml}
           ? data.message || `Denní limit ${DAILY_LIMIT} vyčerpán. Zkus to zítra.`
           : data.error || "Chyba při generování"
         );
-        setLoading(false);
+        setHtml("");
+        setHasResult(false);
         return;
       }
 
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No stream");
-
-      const decoder = new TextDecoder();
-      let accumulated = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        accumulated += decoder.decode(value, { stream: true });
-        setHtml(accumulated);
-      }
-
-      // Prázdný stream = AI nevrátila žádný HTML (např. model odpověděl
-      // textem místo kódu). Chybí viditelná chyba místo tichého failu.
-      if (!accumulated.trim()) {
+      const html = await res.text();
+      if (!html.trim()) {
         setError("AI nevrátila žádný kód. Zkus jiný nebo konkrétnější prompt.");
         setHtml("");
+        setHasResult(false);
       } else {
+        setHtml(html);
         setHasResult(true);
+        setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
       }
     } catch (err) {
+      clearInterval(progressInterval);
       if (err instanceof DOMException && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Něco se pokazilo");
     } finally {
       setLoading(false);
+      setProgress(0);
       abortRef.current = null;
     }
   }
@@ -410,7 +413,7 @@ ${rawHtml}
                     {loading ? (
                       <>
                         <RefreshIcon size={12} className="animate-spin-slow" />
-                        Navrhuju
+                        Navrhuju {progress}%
                       </>
                     ) : (
                       <>
@@ -436,7 +439,7 @@ ${rawHtml}
         {/* Loading */}
         {loading && !hasResult && (
           <div className="flex-1 flex items-center justify-center">
-            <LoadingState html={html} />
+            <LoadingState progress={progress} />
           </div>
         )}
 

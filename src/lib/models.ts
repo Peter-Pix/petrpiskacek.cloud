@@ -3,7 +3,7 @@
 
 export const MODELS = {
   // Flash UI — streaming HTML, rychlý, levný
-  flashUI: "gemma4:31b",
+  flashUI: "minimax-m3",
 
   // Sparring — multipurpose: clarify, expand, block generation
   sparring: "gemma4:31b",
