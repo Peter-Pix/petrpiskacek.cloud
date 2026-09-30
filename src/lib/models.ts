@@ -2,16 +2,13 @@
 // Pokud chceš přepnout model, změň tady. Žádné hardcoded stringy v routes.
 
 export const MODELS = {
-  // Flash UI — streaming HTML, rychlý, levný
+  // Flash UI — generování HTML (non-stream, spolehlivější extrakce kódu)
   flashUI: "minimax-m3",
 
-  // Sparring — multipurpose: clarify, expand, block generation
+  // Sparring + Challenge page — multipurpose: clarify, expand, block generation
   sparring: "gemma4:31b",
 
-  // Challenge — solution architect, kvalitní Markdown
-  challenge: "anthropic/claude-3.5-sonnet",
-
-  // Random prompts — kreativní nápady, méně konzistentní
+  // Random prompts — kreativní nápady pro Flash UI a Sparring
   randomPrompt: "gemma4:31b",
 } as const;
 
