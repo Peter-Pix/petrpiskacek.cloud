@@ -301,7 +301,7 @@ export default function SparringForm() {
           Promysli to lépe
         </h2>
         <p className="subhead mx-auto mb-10 max-w-xl text-center">
-          Vyber téma. Douptám se. Uvidíš sám.
+          Vyber téma. Doptám se. Uvidíš sám.
         </p>
 
         {/* Fáze 0: Input */}
