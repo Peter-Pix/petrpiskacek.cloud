@@ -100,8 +100,8 @@ export async function POST(req: NextRequest) {
     if (!limit.allowed) {
       return NextResponse.json(
         {
-          error: "Denni limit vycerpan.",
-          message: "Muzes generovat max 5x denne. Zkus to zitra.",
+          error: "Denní limit využitý.",
+          message: "Dneska jsi vyčerpal svých 5 návrhů. Zítra máš zase plnou náruč možností.",
           limit: DAILY_LIMIT,
           remaining: 0,
         },
@@ -120,12 +120,12 @@ export async function POST(req: NextRequest) {
     const { prompt } = body;
 
     if (!prompt || typeof prompt !== "string") {
-      return NextResponse.json({ error: "Chybi prompt." }, { status: 400 });
+      return NextResponse.json({ error: "Chybí zadání." }, { status: 400 });
     }
 
     const apiKey = process.env.OLLAMA_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "Chybi API klic." }, { status: 500 });
+      return NextResponse.json({ error: "Služba je dočasně nedostupná." }, { status: 500 });
     }
 
     const response = await fetch(OLLAMA_URL, {
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
       const text = await response.text().catch(() => "");
       console.error("Ollama error:", response.status, text.slice(0, 300));
       return NextResponse.json(
-        { error: "AI sluzba neni dostupna." },
+        { error: "Omlouváme se — náš AI návrhář má právě plné ruce práce. Zkus to za chvilku, jak se fronta trochu uvolní." },
         { status: 502 }
       );
     }
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
     if (!html) {
       console.error("No HTML extracted. Raw preview:", rawOutput.slice(0, 500));
       return NextResponse.json(
-        { error: "AI nevrátila platný HTML kód. Zkus jiný nebo konkrétnější prompt." },
+        { error: "Omlouváme se — teď je o Flash UI takový zájem, že server potřebuje krátký dech. Zkus to za pár vteřin." },
         { status: 502 }
       );
     }
@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("Flash UI API error:", err);
     return NextResponse.json(
-      { error: "Necco se pokazilo." },
+      { error: "Omlouváme se — momentálně je o naše návrhy takový nával, že servery potřebují pauzu. Zkus to za chvilku." },
       { status: 500 }
     );
   }

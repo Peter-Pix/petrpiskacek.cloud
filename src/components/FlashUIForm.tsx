@@ -261,8 +261,8 @@ ${rawHtml}
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setError(res.status === 429
-          ? data.message || `Denní limit ${DAILY_LIMIT} vyčerpán. Zkus to zítra.`
-          : data.error || "Chyba při generování"
+          ? data.message || `Dneska jsi vyčerpal svých ${DAILY_LIMIT} návrhů. Zítra máš zase plnou náruč možností.`
+          : data.error || "Omlouváme se — Flash UI má právě takový nával zájmu, že se to chvilku zaseklo. Zkus to znovu."
         );
         setHtml("");
         setHasResult(false);
@@ -271,7 +271,7 @@ ${rawHtml}
 
       const html = await res.text();
       if (!html.trim()) {
-        setError("AI nevrátila žádný kód. Zkus jiný nebo konkrétnější prompt.");
+        setError("Omlouváme se — teď je o naše návrhy takový zájem, že server potřebuje krátký dech. Zkus to za pár vteřin.");
         setHtml("");
         setHasResult(false);
       } else {
@@ -282,7 +282,7 @@ ${rawHtml}
     } catch (err) {
       clearInterval(progressInterval);
       if (err instanceof DOMException && err.name === "AbortError") return;
-      setError(err instanceof Error ? err.message : "Něco se pokazilo");
+      setError(err instanceof Error ? err.message : "Omlouváme se — servery mají momentálně plné ruce práce. Zkus to za chvilku.");
     } finally {
       setLoading(false);
       setProgress(0);
@@ -552,7 +552,7 @@ ${rawHtml}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span>⚠️</span>
-                <span className="font-medium">Chyba</span>
+                <span className="font-medium">Momentálně plno</span>
               </div>
               {error}
             </div>
