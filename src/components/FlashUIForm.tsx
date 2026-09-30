@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { SparklesIcon, RefreshIcon, CheckIcon, ExternalLinkIcon } from "./icons";
+import FlashUIBuildAnimation from "./FlashUIBuildAnimation";
 import { trackEvent } from "@/lib/track";
 
 const RANDOM_PROMPTS = [
@@ -79,44 +80,6 @@ function RotatingPlaceholder({ isActive }: { isActive: boolean }) {
         {ROTATING_TEXTS[index]}
       </span>
     </span>
-  );
-}
-
-// Loading state
-function LoadingState({ progress }: { progress: number }) {
-  const pct = Math.min(progress, 100);
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-6 py-20">
-      <div className="relative">
-        <div className="w-16 h-16 rounded-full border-2 border-gold/20 animate-spin"
-          style={{ borderTopColor: 'var(--gold)' }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <SparklesIcon size={20} className="text-gold animate-pulse" />
-        </div>
-      </div>
-      <div className="text-center space-y-2">
-        <p className="text-sm animate-pulse" style={{ color: 'var(--gold)' }}>
-          {pct > 0 ? `Přemýšlím… ${pct}%` : 'Přemýšlím…'}
-        </p>
-        <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-          AI kreslí HTML
-        </p>
-      </div>
-      <div className="w-48 h-1 rounded-full overflow-hidden"
-        style={{ backgroundColor: 'var(--border)' }}
-      >
-        <div
-          className="h-full rounded-full transition-all duration-300 animate-progress-shimmer"
-          style={{
-            width: `${pct}%`,
-            background: 'linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold))',
-            backgroundSize: '200% 100%',
-          }}
-        />
-      </div>
-    </div>
   );
 }
 
@@ -436,10 +399,10 @@ ${rawHtml}
           </div>
         </div>
 
-        {/* Loading */}
+        {/* Loading — 25s build animace ("AI staví komponentu") */}
         {loading && !hasResult && (
-          <div className="flex-1 flex items-center justify-center">
-            <LoadingState progress={progress} />
+          <div className="flex-1">
+            <FlashUIBuildAnimation />
           </div>
         )}
 

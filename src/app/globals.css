@@ -721,3 +721,102 @@ html, body {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================
+   Flash UI — Build animation (25s "AI staví komponentu")
+   ============================================================ */
+
+/* Scan beam — světelný pruh přejíždějící přes scénu */
+@keyframes flashScanBeam {
+  0%   { left: -10%; opacity: 0; }
+  8%   { opacity: 0.75; }
+  45%  { opacity: 0.75; }
+  60%  { left: 110%; opacity: 0; }
+  100% { left: 110%; opacity: 0; }
+}
+.animate-flash-scan {
+  animation: flashScanBeam 3.2s ease-in-out infinite;
+}
+
+/* Ambient breathing glow */
+@keyframes flashAmbient {
+  0%, 100% { opacity: 0.22; transform: scale(1); }
+  50%      { opacity: 0.42; transform: scale(1.06); }
+}
+.animate-flash-ambient {
+  animation: flashAmbient 8s ease-in-out infinite;
+}
+
+/* Floating particles */
+@keyframes flashParticleRise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  15%  { opacity: var(--p-opacity, 0.5); }
+  85%  { opacity: var(--p-opacity, 0.5); }
+  100% { transform: translateY(-320px) translateX(var(--p-drift, 0px)); opacity: 0; }
+}
+.animate-flash-particle {
+  animation: flashParticleRise var(--p-duration, 9s) linear infinite;
+  animation-delay: var(--p-delay, 0s);
+}
+
+/* Stage blur transition (enter) */
+@keyframes flashStageIn {
+  from { opacity: 0; transform: translateY(26px) scale(0.97); filter: blur(14px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.animate-flash-stage-in {
+  animation: flashStageIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Terminal readout line reveal */
+@keyframes flashLineIn {
+  from { opacity: 0; transform: translateX(-6px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+.animate-flash-line {
+  animation: flashLineIn 0.45s ease-out both;
+}
+
+/* Skeleton block pulse */
+@keyframes flashSkeletonPulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+.animate-flash-skeleton {
+  animation: flashSkeletonPulse 2.4s ease-in-out infinite;
+}
+
+/* Success flash on final stage */
+@keyframes flashSuccessPop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  55%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-flash-success {
+  animation: flashSuccessPop 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Progress ring sweep (fallback conic via rotate) */
+@keyframes flashRingSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-flash-ring {
+  animation: flashRingSpin 4s linear infinite;
+}
+
+/* Reduced motion: vypnout dekorativní vrstvy */
+@media (prefers-reduced-motion: reduce) {
+  .animate-flash-scan,
+  .animate-flash-ambient,
+  .animate-flash-particle,
+  .animate-flash-skeleton,
+  .animate-flash-ring {
+    animation: none !important;
+  }
+  .animate-flash-stage-in,
+  .animate-flash-line,
+  .animate-flash-success {
+    animation-duration: 0.15s !important;
+  }
+}
